@@ -7,10 +7,23 @@ version: 1.0.0+1
 environment:
   sdk: ^3.8.1
 
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  adaptive_icon_background: "#FFFFFF" # or your brand color
+  adaptive_icon_foreground: assets/icons/app_icon_foreground.png
+  image_path: assets/icons/app_icon.png
+  image_path_ios: assets/icons/app_icon.png
+  remove_alpha_ios: true
+  min_sdk_android: 21
+  adaptive_icon_monochrome: assets/icons/app_icon_monochrome.png
+
 dependencies:
   flutter:
     sdk: flutter
-  # NAV + STATE (we'll wire go_router soon; tabs are local state first)
+  # NAV + STATE 
   go_router: ^14.2.0
   provider: ^6.1.2
 
@@ -24,8 +37,13 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1 
 
 flutter:
 
   uses-material-design: true
+  assets:
+    - assets/icons/app_icon.png
+    - assets/icons/app_icon_foreground.png
+    - assets/icons/app_icon_monochrome.png
 
