@@ -6,6 +6,6 @@ class BudgetApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //use material router for now
+    //use material router for now to add go_router later now
   }
 }
