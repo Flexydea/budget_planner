@@ -1,3 +1,4 @@
+import 'package:budget_planner/core/widgets/section_card.dart';
 import 'package:budget_planner/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -69,63 +70,113 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             key: _formKey,
             child: Column(
               children: [
-                TextFormField(
-                  controller: _emailC,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'Account email'),
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return 'Enter your email';
-                    final ok = RegExp(
-                      r'^[\w\.\-]+@[\w\-]+\.[\w\.\-]+$',
-                    ).hasMatch(v);
-                    return ok ? null : 'Enter a valid email';
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _newPassC,
-                  obscureText: _obscure1,
-                  decoration: InputDecoration(
-                    labelText: 'New password',
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscure1 ? Icons.visibility : Icons.visibility_off,
+                const SizedBox(height: 30),
+                SectionCard(
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _emailC,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'Account email',
+                        ),
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return 'Enter your email';
+                          final ok = RegExp(
+                            r'^[\w\.\-]+@[\w\-]+\.[\w\.\-]+$',
+                          ).hasMatch(v);
+                          return ok ? null : 'Enter a valid email';
+                        },
                       ),
-                      onPressed: () => setState(() => _obscure1 = !_obscure1),
-                    ),
-                  ),
-                  validator: (v) =>
-                      (v == null || v.length < 6) ? 'Min 6 characters' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _confirmC,
-                  obscureText: _obscure2,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm new password',
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscure2 ? Icons.visibility : Icons.visibility_off,
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _newPassC,
+                        obscureText: _obscure1,
+                        decoration: InputDecoration(
+                          labelText: 'New password',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscure1
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () =>
+                                setState(() => _obscure1 = !_obscure1),
+                          ),
+                        ),
+                        validator: (v) => (v == null || v.length < 6)
+                            ? 'Min 6 characters'
+                            : null,
                       ),
-                      onPressed: () => setState(() => _obscure2 = !_obscure2),
-                    ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _confirmC,
+                        obscureText: _obscure2,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm new password',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscure2
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () =>
+                                setState(() => _obscure2 = !_obscure2),
+                          ),
+                        ),
+                        validator: (v) => (v == null || v.length < 6)
+                            ? 'Min 6 characters'
+                            : null,
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1A237E),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          onPressed: _loading ? null : _reset,
+                          child: _loading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  'Update password',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
                   ),
-                  validator: (v) =>
-                      (v == null || v.length < 6) ? 'Min 6 characters' : null,
                 ),
                 const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: _loading ? null : _reset,
-                    child: _loading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Update password'),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Remember Password? "),
+                    GestureDetector(
+                      onTap: () => context.go('/auth/login'),
+                      child: Text(
+                        'Login',
+                        style: TextStyle(
+                          color: scheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
