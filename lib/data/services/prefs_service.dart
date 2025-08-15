@@ -5,7 +5,7 @@ class PrefsService {
 
   //has the user completed onboarding?
 
-  static Future<bool> get hahasOnboarded async {
+  static Future<bool> get hasOnboarded async {
     final p = await SharedPreferences.getInstance();
     return p.getBool(_kOnboarded) ?? false;
   }

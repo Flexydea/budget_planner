@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:budget_planner/data/services/prefs_service.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
@@ -24,12 +26,15 @@ class _SplashScreen extends State<SplashScreen>
       vsync: this,
       duration: const Duration(seconds: 4),
     );
-    _controller.addStatusListener((status) {
+    _controller.addStatusListener((status) async {
       if (status == AnimationStatus.completed && mounted) {
-        // Defer to next frame so GoRouter is definitely in the tree.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+        // defer to next frame so router context is ready
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
           if (!mounted) return;
-          context.go('/onboarding');
+          final onboarded = await PrefsService.hasOnboarded; // NEW
+          // route based on flag (auth check later)
+          if (!mounted) return;
+          context.go(onboarded ? '/auth/login' : '/onboarding');
         });
       }
     });
@@ -69,16 +74,6 @@ class _SplashScreen extends State<SplashScreen>
               fit: BoxFit.contain,
             ),
             const SizedBox(height: 20),
-
-            //Text below lottie
-            // const Text(
-            //   'Budget Planner',
-            //   style: TextStyle(
-            //     fontSize: 20,
-            //     fontWeight: FontWeight.bold,
-            //     color: Colors.black87,
-            //   ),
-            // ),
           ],
         ),
       ),

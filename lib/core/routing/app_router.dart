@@ -1,3 +1,4 @@
+import 'package:budget_planner/features/auth/views/login_screen.dart';
 import 'package:budget_planner/features/auth/views/signup_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:budget_planner/features/splash/views/splash_screen.dart';
@@ -13,10 +14,10 @@ final appRouter = GoRouter(
       path: '/auth/signup',
       builder: (_, __) => const SignUpScreen(),
     ), // NEW
-    // GoRoute(
-    //   path: '/auth/login',
-    //   builder: (_, __) => const LoginScreen(),
-    // ), // NEW
+    GoRoute(
+      path: '/auth/login',
+      builder: (_, __) => const LoginScreen(),
+    ), // NEW
     // Temporary home placeholder so '/' exists
     GoRoute(path: '/', builder: (_, __) => const _HomePlaceholder()),
   ],

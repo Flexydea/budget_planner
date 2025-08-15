@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:budget_planner/core/utils/currency.dart';
 import 'package:budget_planner/core/widgets/currency_picker.dart';
+import 'package:budget_planner/core/widgets/section_card.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -13,9 +14,10 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   Currency _selectedCurrency = kCurrencies.first;
   final _formKey = GlobalKey<FormState>();
+
   final _nameC = TextEditingController();
   final _emailC = TextEditingController();
-  final _currencyC = TextEditingController(text: 'Dollar (\$)');
+  final _currencyC = TextEditingController();
   final _limitC = TextEditingController(text: '5000');
   final _passC = TextEditingController();
   final _confirmC = TextEditingController();
@@ -53,7 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -64,15 +66,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                // App logo
-                Image.asset(
-                  'assets/icons/app_icon.png', // Your app logo path
-                  height: 80,
-                ),
+                Image.asset('assets/icons/app_icon.png', height: 80),
                 const SizedBox(height: 20),
                 Text(
                   'Get Started',
-                  style: theme.textTheme.headlineSmall?.copyWith(
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -80,133 +78,126 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Text(
                   'It only takes a minute to start taking hold of your finances',
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 30),
 
-                // Name
-                TextFormField(
-                  controller: _nameC,
-                  decoration: const InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Enter your name' : null,
-                ),
-                const SizedBox(height: 15),
-
-                // Email
-                TextFormField(
-                  controller: _emailC,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email Address',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return 'Enter your email';
-                    final emailReg = RegExp(r'^[\w\.\-]+@[\w\-]+\.[\w\.\-]+$');
-                    return emailReg.hasMatch(v) ? null : 'Enter a valid email';
-                  },
-                ),
-                const SizedBox(height: 15),
-
-                // Currency
-                TextFormField(
-                  controller: _currencyC,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Currency',
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.arrow_drop_down),
-                  ),
-                  onTap: () async {
-                    // ELS10: open picker and wait for result
-                    final choice = await showCurrencyPicker(
-                      context,
-                      selected: _selectedCurrency,
-                    );
-                    if (choice != null) {
-                      setState(() => _selectedCurrency = choice);
-                      _currencyC.text = '${choice.name} (${choice.symbol})';
-                    }
-                  },
-                ),
-                const SizedBox(height: 15),
-
-                // Daily limit
-                TextFormField(
-                  controller: _limitC,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Daily limit (\$)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 15),
-
-                // Create Password
-                TextFormField(
-                  controller: _passC,
-                  obscureText: _obscurePass,
-                  decoration: InputDecoration(
-                    labelText: 'Create Password',
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePass ? Icons.visibility : Icons.visibility_off,
+                // section form card feel
+                SectionCard(
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _nameC,
+                        decoration: const InputDecoration(labelText: 'Name'),
+                        validator: (v) =>
+                            v == null || v.isEmpty ? 'Enter your name' : null,
                       ),
-                      onPressed: () =>
-                          setState(() => _obscurePass = !_obscurePass),
-                    ),
-                  ),
-                  validator: (v) =>
-                      v == null || v.length < 6 ? 'Min 6 characters' : null,
-                ),
-                const SizedBox(height: 15),
-
-                // Confirm Password
-                TextFormField(
-                  controller: _confirmC,
-                  obscureText: _obscureConfirm,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirm
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _emailC,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'Email Address',
+                        ),
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return 'Enter your email';
+                          final emailReg = RegExp(
+                            r'^[\w\.\-]+@[\w\-]+\.[\w\.\-]+$',
+                          );
+                          return emailReg.hasMatch(v)
+                              ? null
+                              : 'Enter a valid email';
+                        },
                       ),
-                      onPressed: () =>
-                          setState(() => _obscureConfirm = !_obscureConfirm),
-                    ),
+                      TextFormField(
+                        controller: _currencyC,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Currency',
+                          suffixIcon: Icon(Icons.arrow_drop_down),
+                        ),
+                        onTap: () async {
+                          final choice = await showCurrencyPicker(
+                            context,
+                            selected: _selectedCurrency,
+                          );
+                          if (choice != null) {
+                            setState(() => _selectedCurrency = choice);
+                            _currencyC.text =
+                                '${choice.name} (${choice.symbol})';
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _limitC,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText:
+                              'Daily limit (${_selectedCurrency.symbol})',
+                        ),
+                      ),
+                      TextFormField(
+                        controller: _passC,
+                        obscureText: _obscurePass,
+                        decoration: InputDecoration(
+                          labelText: 'Create Password',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePass
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () =>
+                                setState(() => _obscurePass = !_obscurePass),
+                          ),
+                        ),
+                        validator: (v) => v == null || v.length < 6
+                            ? 'Min 6 characters'
+                            : null,
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _confirmC,
+                        obscureText: _obscureConfirm,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm Password',
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureConfirm
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () => setState(
+                              () => _obscureConfirm = !_obscureConfirm,
+                            ),
+                          ),
+                        ),
+                        validator: (v) => v == null || v.length < 6
+                            ? 'Min 6 characters'
+                            : null,
+                      ),
+                    ],
                   ),
-                  validator: (v) =>
-                      v == null || v.length < 6 ? 'Min 6 characters' : null,
                 ),
-                const SizedBox(height: 25),
+
+                const SizedBox(height: 30),
 
                 // Create Account Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(
-                        0xFF1A237E,
-                      ), // Deep blue from logo
-                      foregroundColor: Colors.white, // White text
+                      backgroundColor: const Color(0xFF1A237E),
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    onPressed: () {
-                      // TODO: Handle create account action
-                    },
+                    onPressed: _submit,
                     child: const Text(
                       'Create Account',
                       style: TextStyle(

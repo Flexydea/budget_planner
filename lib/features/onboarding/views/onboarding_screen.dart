@@ -1,3 +1,4 @@
+import 'package:budget_planner/data/services/prefs_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -58,7 +59,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _skip() => _finish();
 
-  void _finish() {
+  void _finish() async {
+    await PrefsService.setOnboarded(); //rember onboarding done
+    if (!mounted) return;
     context.go('/auth/signup'); // go to create account
   }
 
@@ -160,12 +163,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color.fromARGB(
-                          255,
-                          236,
-                          238,
-                          249,
-                        ), // Text color for Skip
+                        // Text color for Skip
                       ),
                       onPressed: _skip,
                       child: const Text('Skip'),
