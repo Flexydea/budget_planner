@@ -1,6 +1,7 @@
 import 'package:budget_planner/features/auth/views/forgot_password_screen.dart';
 import 'package:budget_planner/features/auth/views/login_screen.dart';
 import 'package:budget_planner/features/auth/views/signup_screen.dart';
+import 'package:budget_planner/features/home/views/home_shell.dart';
 import 'package:go_router/go_router.dart';
 import 'package:budget_planner/features/splash/views/splash_screen.dart';
 import 'package:budget_planner/features/onboarding/views/onboarding_screen.dart';
@@ -20,8 +21,12 @@ final appRouter = GoRouter(
       path: '/auth/forgot',
       builder: (_, __) => const ForgotPasswordScreen(),
     ), // NEW
-    // Temporary home placeholder so '/' exists
-    GoRoute(path: '/', builder: (_, __) => const _HomePlaceholder()),
+    GoRoute(path: '/', builder: (_, __) => const HomeShell()),
+    GoRoute(
+      path: '/expense/new',
+      builder: (_, __) => const Placeholder(),
+    ), // wire later
+    GoRoute(path: '/category/new', builder: (_, __) => const Placeholder()),
   ],
 );
 

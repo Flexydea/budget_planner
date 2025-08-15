@@ -34,7 +34,8 @@ class _SplashScreen extends State<SplashScreen>
           final onboarded = await PrefsService.hasOnboarded; // NEW
           // route based on flag (auth check later)
           if (!mounted) return;
-          context.go(onboarded ? '/auth/login' : '/onboarding');
+          // context.go(onboarded ? '/auth/login' : '/onboarding');
+          context.go('/');
         });
       }
     });
