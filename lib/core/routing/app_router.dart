@@ -1,16 +1,35 @@
-// UPDATED: set initial route to splash and add a route for it.
+import 'package:budget_planner/features/auth/views/signup_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:budget_planner/features/splash/views/splash_screen.dart'; // NEW
-// import 'package:budget_planner/features/home/views/home_shell.dart';
-// import 'package:budget_planner/features/expenses/views/expense_editor_screen.dart';
-// import 'package:budget_planner/features/categories/views/add_category_screen.dart';
+import 'package:budget_planner/features/splash/views/splash_screen.dart';
+import 'package:budget_planner/features/onboarding/views/onboarding_screen.dart';
+import 'package:flutter/material.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/splash', // UPDATED
+  initialLocation: '/splash',
   routes: [
-    GoRoute(path: '/splash', builder: (c, s) => const SplashScreen()), // NEW
-    // GoRoute(path: '/', builder: (c, s) => const HomeShell()),
-    // GoRoute(path: '/expense/new', builder: (c, s) => const ExpenseEditorScreen()),
-    // GoRoute(path: '/category/new', builder: (c, s) => const AddCategoryScreen()),
+    GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
+    GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
+    GoRoute(
+      path: '/auth/signup',
+      builder: (_, __) => const SignUpScreen(),
+    ), // NEW
+    // GoRoute(
+    //   path: '/auth/login',
+    //   builder: (_, __) => const LoginScreen(),
+    // ), // NEW
+    // Temporary home placeholder so '/' exists
+    GoRoute(path: '/', builder: (_, __) => const _HomePlaceholder()),
   ],
 );
+
+class _HomePlaceholder extends StatelessWidget {
+  const _HomePlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Home')),
+      body: const Center(child: Text('Hello World')),
+    );
+  }
+}

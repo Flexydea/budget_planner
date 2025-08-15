@@ -26,8 +26,11 @@ class _SplashScreen extends State<SplashScreen>
     );
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) {
-        //after animation ends go to home
-        context.go('/');
+        // Defer to next frame so GoRouter is definitely in the tree.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          context.go('/onboarding');
+        });
       }
     });
   }
