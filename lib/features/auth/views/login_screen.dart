@@ -1,3 +1,4 @@
+import 'package:budget_planner/data/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:budget_planner/core/widgets/section_card.dart';
@@ -15,6 +16,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passC = TextEditingController();
   bool _obscurePass = true;
 
+  bool _loading =
+      false; // ELS10: disable button + show spinner while logging in
+
   @override
   void dispose() {
     _emailC.dispose();
@@ -22,9 +26,25 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
+  Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-    context.go('/'); // navigate to home after login
+
+    setState(() => _loading = true);
+    try {
+      await AuthService.login(
+        email: _emailC.text.trim(),
+        password: _passC.text, // ELS10: don't trim passwords
+      );
+
+      if (!mounted) return;
+      context.go('/'); // ✅ only reaches here if no exception thrown
+    } catch (e) {
+      if (!mounted) return;
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
@@ -58,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // Email & Password fields in SectionCard
+                // ELS10: group fields in a fintech-style card
                 SectionCard(
                   child: Column(
                     children: [
@@ -94,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 setState(() => _obscurePass = !_obscurePass),
                           ),
                         ),
-                        validator: (v) => v == null || v.length < 6
+                        validator: (v) => (v == null || v.length < 6)
                             ? 'Min 6 characters'
                             : null,
                       ),
@@ -104,13 +124,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 10),
 
-                // Forgot password
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      // TODO: Handle forgot password
-                    },
+                    onPressed: () => context.go('/auth/forgot'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: scheme.primary,
+                    ),
                     child: const Text('Forgot Password?'),
                   ),
                 ),
@@ -120,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Login button
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: FilledButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1A237E),
                       foregroundColor: Colors.white,
@@ -129,26 +149,33 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    onPressed: _login,
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    onPressed: _loading
+                        ? null
+                        : _login, // ELS10: disable while loading
+                    child: _loading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text(
+                            'Log in',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
 
                 const SizedBox(height: 15),
 
-                // Sign up link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Don't have an account? "),
                     GestureDetector(
-                      onTap: () => context.go('/signup'),
+                      onTap: () => context.go('/auth/signup'),
                       child: Text(
                         'Sign Up',
                         style: TextStyle(

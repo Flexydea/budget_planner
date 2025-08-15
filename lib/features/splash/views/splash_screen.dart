@@ -24,7 +24,7 @@ class _SplashScreen extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 3),
     );
     _controller.addStatusListener((status) async {
       if (status == AnimationStatus.completed && mounted) {

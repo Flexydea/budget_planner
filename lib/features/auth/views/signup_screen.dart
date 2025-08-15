@@ -1,8 +1,11 @@
+import 'package:budget_planner/data/services/auth_service.dart';
+import 'package:budget_planner/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:budget_planner/core/utils/currency.dart';
 import 'package:budget_planner/core/widgets/currency_picker.dart';
 import 'package:budget_planner/core/widgets/section_card.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -42,7 +45,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_passC.text != _confirmC.text) {
       ScaffoldMessenger.of(
@@ -50,7 +53,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
       return;
     }
-    context.go('/');
+    try {
+      await context.read<AuthProvider>().signUp(
+        _nameC.text.trim(),
+        _emailC.text.trim(),
+        _passC.text,
+      );
+
+      // 🔍 Debug: Check what got saved
+      // final email = await AuthService.currentEmail();
+      // final name = await AuthService.currentName();
+      // debugPrint('Saved user: $name <$email>');
+
+      if (!mounted) return;
+      context.go('/'); // success → Home
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.read<AuthProvider>().error ?? 'Sign up failed'),
+        ),
+      );
+    }
   }
 
   @override
@@ -206,6 +230,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
+                ),
+
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Do you have an account? "),
+                    GestureDetector(
+                      onTap: () => context.go('/auth/login'),
+                      child: Text(
+                        'Login',
+                        style: TextStyle(
+                          color: scheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
