@@ -1,4 +1,3 @@
-import 'package:budget_planner/data/services/auth_service.dart';
 import 'package:budget_planner/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

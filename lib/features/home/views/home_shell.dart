@@ -51,8 +51,8 @@ class _HomeShellState extends State<HomeShell> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.playlist_add),
-                title: const Text('Add Expense'),
+                leading: const Icon(Icons.attach_money),
+                title: const Text('Add Operation'),
                 onTap: () {
                   Navigator.pop(context);
                   context.push('/expense/new'); // wire later
@@ -80,24 +80,6 @@ class _HomeShellState extends State<HomeShell> {
     return Scaffold(
       body: _pages[_index],
 
-      // // In your Scaffold:
-      // floatingActionButton: Transform.translate(
-      //   offset: const Offset(
-      //     0,
-      //     8,
-      //   ), // ↓ move FAB down ~8px (tweak 6–10 if needed)
-      //   child: FloatingActionButton(
-      //     heroTag: 'mainFab',
-      //     onPressed: _showAddSheet,
-      //     backgroundColor: const Color(0xFF1A237E),
-      //     shape: RoundedRectangleBorder(
-      //       borderRadius: BorderRadius.circular(16),
-      //     ),
-      //     child: const Icon(Icons.add),
-      //   ),
-      // ),
-      // floatingActionButtonLocation:
-      //     _LoweredFabLocation(), // custom FAB position
       // In your Scaffold:
       bottomNavigationBar: BottomAppBar(
         elevation: 6,
@@ -106,18 +88,38 @@ class _HomeShellState extends State<HomeShell> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NavItem(icon: Icons.show_chart, label: 'Home', index: 0),
+              _NavItem(
+                icon: Icons.show_chart,
+                label: 'Home',
+                index: 0,
+                selected: _index == 0,
+                onTap: () => _onTap(0),
+              ),
               _NavItem(
                 icon: Icons.category_outlined,
                 label: 'Categories',
                 index: 1,
+                selected: _index == 1,
+                onTap: () => _onTap(1),
               ),
 
               // ⬇️ Middle “tab” plus – aligned with others
               _PlusTab(onTap: _showAddSheet),
 
-              _NavItem(icon: Icons.bar_chart, label: 'Statistics', index: 3),
-              _NavItem(icon: Icons.lightbulb_outline, label: 'Tips', index: 4),
+              _NavItem(
+                icon: Icons.bar_chart,
+                label: 'Statistics',
+                index: 3,
+                selected: _index == 3,
+                onTap: () => _onTap(3),
+              ),
+              _NavItem(
+                icon: Icons.lightbulb_outline,
+                label: 'Tips',
+                index: 4,
+                selected: _index == 4,
+                onTap: () => _onTap(4),
+              ),
             ],
           ),
         ),
@@ -131,37 +133,40 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final int index;
+  final bool selected;
+  final VoidCallback onTap;
+
   const _NavItem({
     required this.icon,
     required this.label,
     required this.index,
+    required this.selected,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final state = context.findAncestorStateOfType<_HomeShellState>()!;
     final scheme = Theme.of(context).colorScheme;
-    final selected = state._index == index;
-    final color = selected ? scheme.primary : scheme.onSurface.withOpacity(.45);
+
+    final color = selected
+        ? Color(0xFF1A237E)
+        : scheme.onSurface.withOpacity(0.45);
+    final weight = selected ? FontWeight.w900 : FontWeight.w700;
+    final iconSize = selected ? 32.0 : 20.0;
 
     return InkWell(
-      onTap: () => state._onTap(index),
+      onTap: onTap,
       borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      child: SizedBox(
+        height: 48,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(height: 1),
+            Icon(icon, color: color, size: iconSize),
+            const SizedBox(height: 2),
             Text(
               label,
-              maxLines: 1,
-              style: TextStyle(
-                fontSize: 11,
-                color: color,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
-              ),
+              style: TextStyle(fontSize: 11, fontWeight: weight, color: color),
             ),
           ],
         ),

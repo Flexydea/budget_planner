@@ -226,8 +226,7 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                       trailing: Text(
-                        (t.isNegative ? '-' : '+') +
-                            '\$${t.amount.abs().toStringAsFixed(0)}',
+                        '${t.isNegative ? '-' : '+'}\$${t.amount.abs().toStringAsFixed(0)}',
                         style: text.titleMedium?.copyWith(
                           color: t.trailingColor(scheme),
                           fontWeight: FontWeight.w800,
