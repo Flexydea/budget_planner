@@ -2,13 +2,15 @@ import 'package:budget_planner/features/auth/views/forgot_password_screen.dart';
 import 'package:budget_planner/features/auth/views/login_screen.dart';
 import 'package:budget_planner/features/auth/views/signup_screen.dart';
 import 'package:budget_planner/features/home/views/home_shell.dart';
+import 'package:budget_planner/features/operations/views/add_operation_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:budget_planner/features/splash/views/splash_screen.dart';
 import 'package:budget_planner/features/onboarding/views/onboarding_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:budget_planner/features/categories/views/add_category_screen.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
     GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
@@ -26,6 +28,14 @@ final appRouter = GoRouter(
       path: '/expense/new',
       builder: (_, __) => const Placeholder(),
     ), // wire later
+    GoRoute(
+      path: '/add-category',
+      builder: (context, state) => const AddCategoryScreen(),
+    ),
+    GoRoute(
+      path: '/add-operation',
+      builder: (context, state) => const AddOperationScreen(),
+    ),
     GoRoute(path: '/category/new', builder: (_, __) => const Placeholder()),
   ],
 );

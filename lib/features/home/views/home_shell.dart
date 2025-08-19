@@ -55,7 +55,7 @@ class _HomeShellState extends State<HomeShell> {
                 title: const Text('Add Operation'),
                 onTap: () {
                   Navigator.pop(context);
-                  context.push('/expense/new'); // wire later
+                  context.push('/add-operation'); // wire later
                 },
               ),
               ListTile(
@@ -63,7 +63,7 @@ class _HomeShellState extends State<HomeShell> {
                 title: const Text('Add Category'),
                 onTap: () {
                   Navigator.pop(context);
-                  context.push('/category/new'); // wire later
+                  context.push('/add-category'); // wire later
                 },
               ),
             ],
