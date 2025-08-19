@@ -145,6 +145,7 @@ class _AddOperationScreenState extends State<AddOperationScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             alignment: Alignment.center,
+
                             child: const Text('Spent'),
                           ),
                         ),
