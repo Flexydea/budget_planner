@@ -20,7 +20,7 @@ class _HomeShellState extends State<HomeShell> {
   // : pages you’ll build out
   final _pages = const [
     DashboardScreen(), // Home
-    CategoriesScreen(), // Categories
+    CategoryScreen(), // Categories
     SizedBox.shrink(), // placeholder; FAB overlays content
     StatsScreen(), // Statistics
     TipsScreen(), // Tips
@@ -148,17 +148,15 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    final color = selected
-        ? Color(0xFF1A237E)
-        : scheme.onSurface.withOpacity(0.45);
-    final weight = selected ? FontWeight.w900 : FontWeight.w700;
-    final iconSize = selected ? 32.0 : 20.0;
+    final color = selected ? Color(0xFF1A237E) : scheme.primary;
+    final weight = selected ? FontWeight.w900 : FontWeight.w300;
+    final iconSize = selected ? 26.0 : 20.0;
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: SizedBox(
-        height: 48,
+        height: 45,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -166,7 +164,7 @@ class _NavItem extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: TextStyle(fontSize: 11, fontWeight: weight, color: color),
+              style: TextStyle(fontSize: 12, fontWeight: weight, color: color),
             ),
           ],
         ),

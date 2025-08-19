@@ -5,7 +5,7 @@ import 'package:budget_planner/data/models/transaction_item.dart';
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
-  // ELS10: mock data; swap with repo later
+  // 🔹 Dummy data for last actions
   List<TransactionItem> get _lastActions => const [
     TransactionItem(
       title: 'Food',
@@ -50,12 +50,10 @@ class DashboardScreen extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
 
-    // ----- numbers (replace with real data later)
-    const double dailyLimit = 1267.0; // 🔹 fixed target
-    const double spentToday = 1100.0; // try 1267.0 to see 360°
+    // 🔸 Static sample values (can be replaced with dynamic state later)
+    const double dailyLimit = 1267.0;
+    const double spentToday = 1100.0;
     final double remaining = (dailyLimit - spentToday).clamp(0, dailyLimit);
-
-    // ring progress (0..1)
     final double progress = (spentToday / dailyLimit).clamp(0.0, 1.0);
 
     return Scaffold(
@@ -65,25 +63,27 @@ class DashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // HEADER
+              // 🔹 HEADER
               Row(
                 children: [
                   Text(
                     'Home',
                     style: text.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                   const Spacer(),
                   IconButton(
-                    onPressed: () {}, // TODO: go to profile/settings
-                    icon: Icon(Icons.person_outline, color: scheme.primary),
+                    onPressed: () {
+                      // TODO: Go to profile/settings
+                    },
+                    icon: Icon(Icons.person_outline, color: Color(0xFF1A237E)),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
 
-              // SPEND RING CARD (centered, large)
+              // 🔸 SPENDING RING CARD
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -104,7 +104,7 @@ class DashboardScreen extends StatelessWidget {
                   children: [
                     Center(
                       child: SizedBox(
-                        width: 320, // <<< large ring
+                        width: 320,
                         height: 400,
                         child: Stack(
                           alignment: Alignment.center,
@@ -113,36 +113,26 @@ class DashboardScreen extends StatelessWidget {
                               progress: progress,
                               size: 320,
                               stroke: 16,
-                              roundedCaps: false, // precise visual length
+                              roundedCaps: false,
                               trackColor: scheme.primary.withOpacity(0.15),
-                              progressColor: const Color(
-                                0xFF1A237E,
-                              ), // brand blue
+                              progressColor: const Color(0xFF1A237E),
                             ),
-                            // inner texts
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Spent today
                                 Text(
                                   '\$${spentToday.toStringAsFixed(0)}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: scheme.onSurface,
-                                      ),
+                                  style: text.headlineMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'you spent today',
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        color: scheme.onSurface.withOpacity(
-                                          0.6,
-                                        ),
-                                      ),
+                                  'You spent today',
+                                  style: text.bodyMedium?.copyWith(
+                                    color: scheme.onSurface.withOpacity(0.6),
+                                  ),
                                 ),
                                 const SizedBox(height: 8),
                                 Divider(
@@ -152,24 +142,18 @@ class DashboardScreen extends StatelessWidget {
                                   color: scheme.outline.withOpacity(0.5),
                                 ),
                                 const SizedBox(height: 8),
-
-                                // Remaining balance
                                 Text(
-                                  'balance for today',
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        color: scheme.onSurface.withOpacity(
-                                          0.6,
-                                        ),
-                                      ),
+                                  'Balance for today',
+                                  style: text.bodyMedium?.copyWith(
+                                    color: scheme.onSurface.withOpacity(0.6),
+                                  ),
                                 ),
                                 Text(
                                   '\$${remaining.toStringAsFixed(0)}',
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  style: text.titleMedium?.copyWith(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -177,41 +161,61 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // (Optional) space for small hint/CTA below the ring
-                    // const SizedBox(height: 12),
-                    // Text('Tap + to add a transaction', style: text.bodySmall?.copyWith(color: scheme.onSurface.withOpacity(.6))),
                   ],
                 ),
               ),
 
               const SizedBox(height: 24),
 
-              // LAST ACTIONS TITLE
-              Text(
-                'Last actions',
-                style: text.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              // 🔹 LAST ACTIONS HEADER WITH VIEW ALL
+              Row(
+                children: [
+                  Text(
+                    'Last actions',
+                    style: text.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      // TODO: Navigate to full transaction list screen
+                    },
+                    child: const Text(
+                      'View all',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A237E),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
 
-              // LAST ACTIONS CARD
-              Container(
-                decoration: BoxDecoration(
-                  color: scheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: scheme.outlineVariant),
-                ),
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _lastActions.length,
-                  separatorBuilder: (_, __) =>
-                      Divider(height: 1, color: scheme.outlineVariant),
-                  itemBuilder: (context, i) {
-                    final t = _lastActions[i];
-                    return ListTile(
+              //  LAST ACTIONS LIST - IN CARDS
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _lastActions.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, i) {
+                  final t = _lastActions[i];
+                  return Card(
+                    elevation: 1,
+                    color: scheme.surface,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: scheme.outlineVariant, width: 1),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
                       leading: Text(
                         t.emoji,
-                        style: const TextStyle(fontSize: 24),
+                        style: const TextStyle(fontSize: 20),
                       ),
                       title: Text(
                         t.title,
@@ -233,11 +237,11 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                       onTap: () {
-                        // TODO: open details
+                        // TODO: Open transaction detail
                       },
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

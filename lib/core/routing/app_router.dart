@@ -8,7 +8,7 @@ import 'package:budget_planner/features/onboarding/views/onboarding_screen.dart'
 import 'package:flutter/material.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: '/',
   routes: [
     GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
     GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
