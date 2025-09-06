@@ -11,14 +11,13 @@ class MyAppView extends StatelessWidget {
       title: 'Budget planner',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blueAccent,
-          background: Colors.grey.shade100,
-          onBackground: Colors.black,
+        colorScheme: ColorScheme.light(
+          primary: Colors.black,
           secondary: Colors.blueAccent,
-          tertiary: Colors.green,
+          tertiary: Colors.white,
+          outline: Colors.grey.shade400,
         ),
-        scaffoldBackgroundColor: Colors.grey,
+        scaffoldBackgroundColor: Colors.grey[350],
       ),
       home: HomeScreen(),
     );
