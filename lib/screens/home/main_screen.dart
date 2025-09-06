@@ -23,8 +23,8 @@ class MainScreen extends StatelessWidget {
                       alignment: Alignment.center,
                       children: [
                         Container(
-                          width: 50,
-                          height: 50,
+                          width: 40,
+                          height: 40,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.black26,
@@ -36,7 +36,6 @@ class MainScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const SizedBox(width: 8),
                     const Column(
                       crossAxisAlignment:
@@ -74,7 +73,14 @@ class MainScreen extends StatelessWidget {
               height: MediaQuery.of(context).size.width / 2,
               decoration: BoxDecoration(
                 color: Colors.black,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 2,
+                    color: Colors.black26,
+                    offset: Offset(5, 5),
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -116,7 +122,7 @@ class MainScreen extends StatelessWidget {
                               ),
                               child: Center(
                                 child: Icon(
-                                  CupertinoIcons.arrow_down,
+                                  CupertinoIcons.arrow_up,
                                   size: 12,
                                   color: Colors.green,
                                 ),
@@ -197,6 +203,116 @@ class MainScreen extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+            SizedBox(height: 40),
+            Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Transactions',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {},
+                  child: Text(
+                    'View All',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black45,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: 10,
+                itemBuilder: (context, i) {
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 16,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.circular(
+                          12,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment
+                                  .spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Stack(
+                                  alignment:
+                                      Alignment.center,
+                                  children: [
+                                    Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration:
+                                          BoxDecoration(
+                                            color: Colors
+                                                .black,
+                                            shape: BoxShape
+                                                .circle,
+                                          ),
+                                    ),
+                                    Icon(
+                                      Icons.food_bank,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(width: 20),
+                                Text(
+                                  'Food',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight:
+                                        FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  '- £89.00',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight:
+                                        FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  'Today',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight:
+                                        FontWeight.w200,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
