@@ -1,5 +1,4 @@
 import 'package:budget_planner/app_view.dart';
-// import 'package:budget_planner/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
