@@ -11,7 +11,7 @@ class MainScreen extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 20.0,
+          horizontal: 25.0,
         ),
         child: Column(
           children: [

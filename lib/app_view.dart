@@ -13,7 +13,7 @@ class MyAppView extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.light(
           primary: Colors.black,
-          secondary: Colors.blueAccent,
+          secondary: Colors.black26,
           tertiary: Colors.white,
           outline: Colors.grey.shade400,
         ),

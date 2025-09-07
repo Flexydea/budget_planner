@@ -39,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedItemColor: Colors.black,
           showSelectedLabels: false,
           showUnselectedLabels: false,
+          elevation: 3,
           items: const [
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.home),
