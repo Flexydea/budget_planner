@@ -33,13 +33,13 @@ class MyListviewTile extends StatelessWidget {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                color: Colors.black,
+                                color: Colors.white60,
                                 shape: BoxShape.circle,
                               ),
                             ),
                             FaIcon(
                               transactionData[i]['icon'],
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
                             // Icon(
                             //   Icons.food_bank,

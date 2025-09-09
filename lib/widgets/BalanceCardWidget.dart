@@ -11,12 +11,13 @@ class BalanceCard extends StatelessWidget {
       height: MediaQuery.of(context).size.width / 2,
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            blurRadius: 2,
-            color: Colors.black26,
-            offset: Offset(5, 5),
+            spreadRadius: 1,
+            blurRadius: 6,
+            color: Colors.black.withOpacity(0.1),
+            offset: Offset(2, 3),
           ),
         ],
       ),
@@ -61,7 +62,7 @@ class BalanceCard extends StatelessWidget {
                       child: Center(
                         child: Icon(
                           CupertinoIcons.arrow_up,
-                          size: 12,
+                          size: 16,
                           color: Colors.green,
                         ),
                       ),
@@ -82,7 +83,7 @@ class BalanceCard extends StatelessWidget {
                         Text(
                           '£ 2,500',
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Colors.green,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -103,7 +104,7 @@ class BalanceCard extends StatelessWidget {
                       child: Center(
                         child: Icon(
                           CupertinoIcons.arrow_down,
-                          size: 12,
+                          size: 16,
                           color: Colors.red,
                         ),
                       ),
@@ -124,7 +125,7 @@ class BalanceCard extends StatelessWidget {
                         Text(
                           '£ 2,500',
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Colors.red,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),

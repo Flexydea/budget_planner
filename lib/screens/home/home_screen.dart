@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:budget_planner/screens/Expense/AddExpense.dart';
 import 'package:budget_planner/screens/home/main_screen.dart';
 import 'package:budget_planner/screens/statistics/statistics.dart';
 import 'package:budget_planner/screens/tips/tips_screen.dart';
@@ -60,9 +61,24 @@ class _HomeScreenState extends State<HomeScreen> {
           FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
+        elevation: 8,
         foregroundColor: Colors.white,
-        onPressed: () {},
-        child: const Icon(CupertinoIcons.add),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(16),
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) =>
+                  const AddExpense(),
+            ),
+          );
+        },
+        child: const Icon(
+          CupertinoIcons.add,
+          color: Colors.white,
+        ),
       ),
       body: index == 0
           ? MainScreen()
