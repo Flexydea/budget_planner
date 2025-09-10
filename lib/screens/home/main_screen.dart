@@ -89,7 +89,7 @@ class MainScreen extends StatelessWidget {
                 GestureDetector(
                   onTap: () {},
                   child: Text(
-                    'See all →',
+                    'See all ',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.black45,

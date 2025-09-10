@@ -23,5 +23,17 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
-
+  assets: 
+    - assets/images/tip_budget.png
+    - assets/images/track_budget.png
+    - assets/images/control_finance.png
+    - assets/images/automate.png
+    - assets/images/emergency.png
+    - assets/images/cut.png
+    - assets/images/50rule.png
+    - assets/images/payoff.png
+    - assets/images/purpose.png
+    - assets/images/monthly.png
+    
+    
 

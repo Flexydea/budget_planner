@@ -169,7 +169,7 @@ class _MyStatisticsState extends State<MyStatistics> {
                           ),
                           child: Text(
                             _selectedRange != null
-                                ? '${_selectedRange!.start.toString().substring(0, 10)} - ${_selectedRange!.end.toString().substring(0, 10)}'
+                                ? '${_selectedRange!.start.toString().substring(0, 10)} To ${_selectedRange!.end.toString().substring(0, 10)}'
                                 : 'Select Date Range',
                             style: const TextStyle(
                               fontSize: 14,
