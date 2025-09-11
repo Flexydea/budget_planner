@@ -3,6 +3,7 @@ import 'package:budget_planner/widgets/BalanceCardWidget.dart';
 import 'package:budget_planner/widgets/TransactionItemTile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -66,13 +67,7 @@ class MainScreen extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const ProfileSettingsScreen(),
-                      ),
-                    );
+                    context.push('/settings');
                   },
                   icon: const Icon(Icons.settings),
                 ),

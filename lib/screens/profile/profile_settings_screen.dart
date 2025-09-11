@@ -3,6 +3,7 @@ import 'package:budget_planner/screens/profile/currency_selector_screen.dart';
 import 'package:budget_planner/screens/profile/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
   const ProfileSettingsScreen({super.key});
@@ -100,22 +101,12 @@ class _ProfileSettingsScreenState
               icon1: Icons.edit_outlined,
               title1: 'Edit Profile',
               onTap1: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EditProfileScreen(),
-                  ),
-                );
+                context.push('/settings/edit-profile');
               },
               icon2: Icons.lock_outline,
               title2: 'Change password',
               onTap2: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChangePasswordScreen(),
-                  ),
-                );
+                context.push('/settings/change-password');
               },
             ),
 
@@ -148,13 +139,7 @@ class _ProfileSettingsScreenState
               icon1: Icons.monetization_on_outlined,
               title1: 'Currency',
               onTap1: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        CurrencySelectorScreen(),
-                  ),
-                );
+                context.push('/settings/currency');
               },
               icon2: Icons
                   .notifications_active_outlined, // Face ID icon

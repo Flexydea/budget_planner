@@ -3,6 +3,7 @@
 import 'package:budget_planner/models/data/data.dart';
 import 'package:budget_planner/screens/tips/tips_detail_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TipsScreen extends StatefulWidget {
   @override
@@ -97,12 +98,9 @@ class _TipsScreenState extends State<TipsScreen> {
                   final tip = _filteredTips[index];
                   return InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              TipDetailScreen(tip: tip),
-                        ),
+                      context.push(
+                        '/tips/detail',
+                        extra: tip,
                       );
                     },
                     borderRadius: BorderRadius.circular(16),

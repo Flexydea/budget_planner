@@ -6,6 +6,7 @@ import 'package:budget_planner/screens/statistics/statistics.dart';
 import 'package:budget_planner/screens/tips/tips_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -67,13 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadiusGeometry.circular(16),
         ),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute<void>(
-              builder: (BuildContext context) =>
-                  const AddExpense(),
-            ),
-          );
+          context.push('/add-expense');
         },
         child: const Icon(
           CupertinoIcons.add,
