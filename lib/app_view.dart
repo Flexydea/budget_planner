@@ -17,7 +17,7 @@ class MyAppView extends StatelessWidget {
           tertiary: Colors.white,
           outline: Colors.grey.shade400,
         ),
-        scaffoldBackgroundColor: Colors.grey[350],
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: HomeScreen(),
     );

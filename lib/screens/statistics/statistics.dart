@@ -2,6 +2,7 @@ import 'package:budget_planner/widgets/chart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MyStatistics extends StatefulWidget {
   const MyStatistics({super.key});
@@ -28,29 +29,21 @@ class _MyStatisticsState extends State<MyStatistics> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      // SizedBox(width: 40),
-                      Text(
-                        'Transactions',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Transactions',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  Icon(Icons.tune),
                 ],
               ),
               const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -133,7 +126,7 @@ class _MyStatisticsState extends State<MyStatistics> {
                   horizontal: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: InkWell(
@@ -169,7 +162,7 @@ class _MyStatisticsState extends State<MyStatistics> {
                           ),
                           child: Text(
                             _selectedRange != null
-                                ? '${_selectedRange!.start.toString().substring(0, 10)} To ${_selectedRange!.end.toString().substring(0, 10)}'
+                                ? '${DateFormat('dd/MM/yyyy').format(_selectedRange!.start)} - ${DateFormat('dd/MM/yyyy').format(_selectedRange!.end)}'
                                 : 'Select Date Range',
                             style: const TextStyle(
                               fontSize: 14,
@@ -210,7 +203,7 @@ class _MyStatisticsState extends State<MyStatistics> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? Colors.black
-                                  : Colors.white,
+                                  : Colors.grey[200],
                               borderRadius:
                                   BorderRadius.circular(10),
                               border: Border.all(
@@ -238,7 +231,7 @@ class _MyStatisticsState extends State<MyStatistics> {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(12),
                 ),
 

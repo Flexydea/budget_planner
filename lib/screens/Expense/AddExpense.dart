@@ -47,9 +47,9 @@ class _AddExpenseState extends State<AddExpense> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.grey[350],
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.grey[350],
+          backgroundColor: Colors.white,
           elevation: 0,
         ),
         body: SingleChildScrollView(
@@ -74,11 +74,14 @@ class _AddExpenseState extends State<AddExpense> {
                       0.5,
                   child: TextFormField(
                     controller: expenseController,
-                    keyboardType: TextInputType.number,
+                    keyboardType:
+                        TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Colors.grey[200],
                       prefixIcon: const Icon(
                         FontAwesomeIcons.sterlingSign,
                         size: 16,
@@ -111,7 +114,7 @@ class _AddExpenseState extends State<AddExpense> {
                   },
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Colors.grey[200],
                     prefixIcon: const Icon(
                       FontAwesomeIcons.exchangeAlt,
                       size: 16,
@@ -135,7 +138,7 @@ class _AddExpenseState extends State<AddExpense> {
                   controller: categoryController,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Colors.grey[200],
                     prefixIcon: const Icon(
                       FontAwesomeIcons.list,
                       size: 16,
@@ -158,7 +161,7 @@ class _AddExpenseState extends State<AddExpense> {
                                     ),
                                   ),
                                   backgroundColor:
-                                      Colors.grey[350],
+                                      Colors.white,
                                   content: SingleChildScrollView(
                                     child: Column(
                                       mainAxisSize:
@@ -171,9 +174,8 @@ class _AddExpenseState extends State<AddExpense> {
                                           decoration: InputDecoration(
                                             isDense: true,
                                             filled: true,
-                                            fillColor:
-                                                Colors
-                                                    .white,
+                                            fillColor: Colors
+                                                .grey[200],
                                             hintText:
                                                 'Name',
                                             border: OutlineInputBorder(
@@ -204,9 +206,8 @@ class _AddExpenseState extends State<AddExpense> {
                                           decoration: InputDecoration(
                                             isDense: true,
                                             filled: true,
-                                            fillColor:
-                                                Colors
-                                                    .white,
+                                            fillColor: Colors
+                                                .grey[200],
 
                                             //displays icon selected
                                             suffixIcon: Row(
@@ -430,7 +431,7 @@ class _AddExpenseState extends State<AddExpense> {
                   },
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Colors.grey[200],
                     prefixIcon: const Icon(
                       FontAwesomeIcons.clock,
                       size: 16,

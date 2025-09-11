@@ -1,3 +1,4 @@
+import 'package:budget_planner/screens/profile/profile_settings_screen.dart';
 import 'package:budget_planner/widgets/BalanceCardWidget.dart';
 import 'package:budget_planner/widgets/TransactionItemTile.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,17 +25,17 @@ class MainScreen extends StatelessWidget {
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.black26,
+                        CircleAvatar(
+                          radius: 22,
+                          backgroundColor: Colors.black,
+                          child: const Text(
+                            'GI',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
                           ),
-                        ),
-                        Icon(
-                          CupertinoIcons.person_fill,
-                          color: Colors.black,
                         ),
                       ],
                     ),
@@ -64,8 +65,16 @@ class MainScreen extends StatelessWidget {
                   ],
                 ),
                 IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const ProfileSettingsScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.settings),
                 ),
               ],
             ),

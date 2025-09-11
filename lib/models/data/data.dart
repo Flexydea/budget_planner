@@ -2,6 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+final List<Map<String, dynamic>> currencies = [
+  {'code': 'GBP', 'symbol': '£'},
+  {'code': 'USD', 'symbol': '\$'},
+  {'code': 'EUR', 'symbol': '€'},
+  {'code': 'NGN', 'symbol': '₦'},
+  {'code': 'CAD', 'symbol': 'C\$'},
+  {'code': 'JPY', 'symbol': '¥'},
+];
+
 List<Map<String, dynamic>> transactionData = [
   {
     'icon': FontAwesomeIcons.burger,

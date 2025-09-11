@@ -27,9 +27,15 @@ class _TipsScreenState extends State<TipsScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[350],
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -49,16 +55,30 @@ class _TipsScreenState extends State<TipsScreen> {
                 horizontal: 12,
               ),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TextField(
                 controller: _searchController,
                 onChanged: _filterTips,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Search',
                   border: InputBorder.none,
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
+
+                  // Cancel/Clear button appears only when there is text
+                  suffixIcon:
+                      _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            _filterTips(
+                              '',
+                            ); // Reset the filtered tips
+                          },
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -88,7 +108,7 @@ class _TipsScreenState extends State<TipsScreen> {
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white60,
+                        color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(
                           16,
                         ),

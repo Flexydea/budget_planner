@@ -15,7 +15,7 @@ class MyListviewTile extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.grey[400],
+                color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
