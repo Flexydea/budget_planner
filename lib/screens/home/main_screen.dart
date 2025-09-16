@@ -58,7 +58,6 @@ class MainScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
                           ),
                         ),
                       ],
@@ -96,7 +95,6 @@ class MainScreen extends StatelessWidget {
                     'See all ',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.black45,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

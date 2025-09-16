@@ -47,9 +47,13 @@ class _AddExpenseState extends State<AddExpense> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.background,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.background,
           elevation: 0,
         ),
         body: SingleChildScrollView(
@@ -81,7 +85,9 @@ class _AddExpenseState extends State<AddExpense> {
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: Colors.grey[200],
+                      fillColor: Theme.of(
+                        context,
+                      ).colorScheme.surface,
                       prefixIcon: const Icon(
                         FontAwesomeIcons.sterlingSign,
                         size: 16,
@@ -101,6 +107,11 @@ class _AddExpenseState extends State<AddExpense> {
                 // Income or Expense dropdown
                 DropdownButtonFormField<String>(
                   value: selectedType,
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface,
+                  ),
                   items: typeOptions.map((type) {
                     return DropdownMenuItem<String>(
                       value: type,
@@ -114,7 +125,9 @@ class _AddExpenseState extends State<AddExpense> {
                   },
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.grey[200],
+                    fillColor: Theme.of(
+                      context,
+                    ).colorScheme.surface,
                     prefixIcon: const Icon(
                       FontAwesomeIcons.exchangeAlt,
                       size: 16,
@@ -138,7 +151,9 @@ class _AddExpenseState extends State<AddExpense> {
                   controller: categoryController,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.grey[200],
+                    fillColor: Theme.of(
+                      context,
+                    ).colorScheme.surface,
                     prefixIcon: const Icon(
                       FontAwesomeIcons.list,
                       size: 16,
@@ -160,8 +175,9 @@ class _AddExpenseState extends State<AddExpense> {
                                           FontWeight.w500,
                                     ),
                                   ),
-                                  backgroundColor:
-                                      Colors.white,
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.background,
                                   content: SingleChildScrollView(
                                     child: Column(
                                       mainAxisSize:
@@ -174,8 +190,12 @@ class _AddExpenseState extends State<AddExpense> {
                                           decoration: InputDecoration(
                                             isDense: true,
                                             filled: true,
-                                            fillColor: Colors
-                                                .grey[200],
+                                            fillColor:
+                                                Theme.of(
+                                                      context,
+                                                    )
+                                                    .colorScheme
+                                                    .surface,
                                             hintText:
                                                 'Name',
                                             border: OutlineInputBorder(
@@ -206,8 +226,12 @@ class _AddExpenseState extends State<AddExpense> {
                                           decoration: InputDecoration(
                                             isDense: true,
                                             filled: true,
-                                            fillColor: Colors
-                                                .grey[200],
+                                            fillColor:
+                                                Theme.of(
+                                                      context,
+                                                    )
+                                                    .colorScheme
+                                                    .surface,
 
                                             //displays icon selected
                                             suffixIcon: Row(
@@ -226,8 +250,9 @@ class _AddExpenseState extends State<AddExpense> {
                                                       selectedIcon,
                                                       size:
                                                           20,
-                                                      color:
-                                                          Colors.black,
+                                                      color: Theme.of(
+                                                        context,
+                                                      ).colorScheme.onSurface,
                                                     ),
                                                   ),
                                                 const Icon(
@@ -261,10 +286,11 @@ class _AddExpenseState extends State<AddExpense> {
                                                   context,
                                                 ).size.width,
                                                 height: 200,
-                                                decoration: const BoxDecoration(
-                                                  color: Colors
-                                                      .white,
-                                                  borderRadius: BorderRadius.vertical(
+                                                decoration: BoxDecoration(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.surface, // card background
+                                                  borderRadius: const BorderRadius.vertical(
                                                     bottom:
                                                         Radius.circular(
                                                           12,
@@ -316,7 +342,9 @@ class _AddExpenseState extends State<AddExpense> {
                                                             ),
                                                             child: Container(
                                                               decoration: BoxDecoration(
-                                                                color: Colors.white,
+                                                                color: Theme.of(
+                                                                  context,
+                                                                ).colorScheme.surface,
                                                                 borderRadius: BorderRadius.circular(
                                                                   5,
                                                                 ),
@@ -324,8 +352,14 @@ class _AddExpenseState extends State<AddExpense> {
                                                                   color:
                                                                       selectedIcon ==
                                                                           iconData
-                                                                      ? Colors.black
-                                                                      : Colors.grey.shade300,
+                                                                      ? Theme.of(
+                                                                              context,
+                                                                            )
+                                                                            .colorScheme
+                                                                            .primary // highlight border
+                                                                      : Theme.of(
+                                                                          context,
+                                                                        ).dividerColor, // normal border
                                                                   width:
                                                                       selectedIcon ==
                                                                           iconData
@@ -337,7 +371,9 @@ class _AddExpenseState extends State<AddExpense> {
                                                                 child: Icon(
                                                                   iconData,
                                                                   size: 30,
-                                                                  color: Colors.black,
+                                                                  color: Theme.of(
+                                                                    context,
+                                                                  ).colorScheme.onSurface, // adapts text/icon
                                                                 ),
                                                               ),
                                                             ),
@@ -347,8 +383,8 @@ class _AddExpenseState extends State<AddExpense> {
                                                 ),
                                               )
                                             : const SizedBox.shrink(),
-                                        SizedBox(
-                                          height: 10,
+                                        const SizedBox(
+                                          height: 20,
                                         ),
                                         SizedBox(
                                           width: double
@@ -360,8 +396,13 @@ class _AddExpenseState extends State<AddExpense> {
                                                 () {},
                                             style: TextButton.styleFrom(
                                               backgroundColor:
-                                                  Colors
-                                                      .black,
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary, // button color
+                                              foregroundColor:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.onPrimary, // text/icon color
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(
@@ -374,9 +415,7 @@ class _AddExpenseState extends State<AddExpense> {
                                               style: TextStyle(
                                                 fontSize:
                                                     22,
-                                                color: Colors
-                                                    .white,
-                                              ),
+                                              ), // no manual color
                                             ),
                                           ),
                                         ),
@@ -431,12 +470,22 @@ class _AddExpenseState extends State<AddExpense> {
                   },
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.grey[200],
-                    prefixIcon: const Icon(
+                    fillColor: Theme.of(context)
+                        .colorScheme
+                        .surface, //  adapts light/dark
+                    prefixIcon: Icon(
                       FontAwesomeIcons.clock,
                       size: 16,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface, //  adapts icon color
                     ),
                     hintText: 'Date',
+                    hintStyle: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).hintColor, // proper hint text color
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
                         10,
@@ -455,7 +504,12 @@ class _AddExpenseState extends State<AddExpense> {
                   child: TextButton(
                     onPressed: () {},
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .primary, // button background
+                      foregroundColor: Theme.of(context)
+                          .colorScheme
+                          .onPrimary, // text/icon color
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           10,
@@ -464,7 +518,9 @@ class _AddExpenseState extends State<AddExpense> {
                     ),
                     child: const Text(
                       'Save',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                        fontSize: 18,
+                      ), // no hardcoded color
                     ),
                   ),
                 ),

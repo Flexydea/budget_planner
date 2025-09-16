@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'widgets/onboarding_category_step.dart';
 import 'widgets/onboarding_name_step.dart';
 import 'widgets/onboarding_dob_step.dart';
+import 'package:budget_planner/core/theme/app_theme.dart'; // import your AppTheme
 
 class OnboardingFlowScreen extends StatefulWidget {
   const OnboardingFlowScreen({super.key});
@@ -36,58 +37,64 @@ class _OnboardingFlowScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          const SizedBox(height: 40),
-          const SizedBox(height: 40),
-          // Moving progress bar
-          LinearProgressIndicator(
-            value: (_currentPage + 1) / _totalSteps,
-            backgroundColor: Colors.grey,
-            color: Colors.black,
-            minHeight: 4,
-          ),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (index) {
-                setState(() => _currentPage = index);
-              },
-              children: [
-                OnboardingCategoryStep(
-                  selectedTitles: _selectedCategories,
-                  onToggleCategory: (title) {
-                    setState(() {
-                      if (_selectedCategories.contains(
-                        title,
-                      )) {
-                        _selectedCategories.remove(title);
-                      } else if (_selectedCategories
-                              .length <
-                          6) {
-                        _selectedCategories.add(title);
-                      }
-                    });
-                  },
-                  onNext: _nextPage,
-                ),
-                OnboardingNameStep(
-                  nameController: _nameController,
-                  onNext: _nextPage,
-                ),
-                OnboardingDobStep(
-                  selectedDate: _selectedDate,
-                  onDateChanged: (date) {
-                    setState(() => _selectedDate = date);
-                  },
-                  onFinish: _nextPage,
-                ),
-              ],
+    return Theme(
+      data: AppTheme.light, // light theme here
+      child: Scaffold(
+        backgroundColor: Colors.white, //  white always
+        body: Column(
+          children: [
+            const SizedBox(height: 40),
+            const SizedBox(height: 40),
+            // Moving progress bar
+            LinearProgressIndicator(
+              value: (_currentPage + 1) / _totalSteps,
+              backgroundColor:
+                  Colors.grey[300], // softer grey
+              color: Colors.black, // progress bar black
+              minHeight: 4,
             ),
-          ),
-        ],
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics:
+                    const NeverScrollableScrollPhysics(),
+                onPageChanged: (index) {
+                  setState(() => _currentPage = index);
+                },
+                children: [
+                  OnboardingCategoryStep(
+                    selectedTitles: _selectedCategories,
+                    onToggleCategory: (title) {
+                      setState(() {
+                        if (_selectedCategories.contains(
+                          title,
+                        )) {
+                          _selectedCategories.remove(title);
+                        } else if (_selectedCategories
+                                .length <
+                            6) {
+                          _selectedCategories.add(title);
+                        }
+                      });
+                    },
+                    onNext: _nextPage,
+                  ),
+                  OnboardingNameStep(
+                    nameController: _nameController,
+                    onNext: _nextPage,
+                  ),
+                  OnboardingDobStep(
+                    selectedDate: _selectedDate,
+                    onDateChanged: (date) {
+                      setState(() => _selectedDate = date);
+                    },
+                    onFinish: _nextPage,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

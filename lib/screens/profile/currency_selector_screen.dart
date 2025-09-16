@@ -28,7 +28,7 @@ class _CurrencySelectorScreenState
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: Colors.grey[200],
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: isSelected
                   ? Border.all(
@@ -50,10 +50,7 @@ class _CurrencySelectorScreenState
                 style: const TextStyle(fontSize: 16),
               ),
               trailing: isSelected
-                  ? const Icon(
-                      Icons.check_circle,
-                      color: Colors.black,
-                    )
+                  ? const Icon(Icons.check_circle)
                   : null,
               onTap: () {
                 setState(() {

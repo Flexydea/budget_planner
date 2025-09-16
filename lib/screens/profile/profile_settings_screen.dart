@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:budget_planner/providers/theme_provider.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
   const ProfileSettingsScreen({super.key});
@@ -14,7 +16,9 @@ class _ProfileSettingsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(
+        context,
+      ).colorScheme.background,
       appBar: AppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -38,7 +42,6 @@ class _ProfileSettingsScreenState
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
                           ),
                         ),
                         Text(
@@ -46,7 +49,6 @@ class _ProfileSettingsScreenState
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey,
                           ),
                         ),
                       ],
@@ -74,7 +76,9 @@ class _ProfileSettingsScreenState
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -131,6 +135,42 @@ class _ProfileSettingsScreenState
             /// Preferences
             const SizedBox(height: 20),
             _buildSectionTitle('Preferences'),
+
+            // Theme toggle section
+            Consumer<ThemeProvider>(
+              builder: (context, themeProv, _) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 6,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface,
+
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.dark_mode),
+                    title: const Text('Dark Mode'),
+                    trailing: Switch(
+                      value: themeProv.isDarkMode,
+                      onChanged: (val) {
+                        context
+                            .read<ThemeProvider>()
+                            .toggleTheme(val);
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+
             _buildGroupedTileCardPreference(
               icon1: Icons.monetization_on_outlined,
               title1: 'Currency',
@@ -147,6 +187,8 @@ class _ProfileSettingsScreenState
                 });
               },
             ),
+
+            const SizedBox(height: 10),
 
             /// Legal
             const SizedBox(height: 20),
@@ -217,21 +259,21 @@ class _ProfileSettingsScreenState
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(icon1, color: Colors.black),
+            leading: Icon(icon1),
             title: Text(title1, style: const TextStyle()),
 
             onTap: onTap1,
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(icon2, color: Colors.black),
+            leading: Icon(icon2),
             title: Text(title2, style: const TextStyle()),
 
             onTap: onTap2,
@@ -260,14 +302,15 @@ class _ProfileSettingsScreenState
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Theme.of(context).colorScheme.surface,
+
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(icon2, color: Colors.black),
+            leading: Icon(icon2),
             title: Text(title2, style: const TextStyle()),
             trailing: Switch(
               value: faceIdEnabled,
@@ -276,7 +319,7 @@ class _ProfileSettingsScreenState
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(icon3, color: Colors.black),
+            leading: Icon(icon3),
             title: Text(title3, style: const TextStyle()),
             trailing: Switch(
               value: balanceEnabled,
@@ -305,21 +348,21 @@ class _ProfileSettingsScreenState
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(icon1, color: Colors.black),
+            leading: Icon(icon1),
             title: Text(title1, style: const TextStyle()),
 
             onTap: onTap1,
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(icon2, color: Colors.black),
+            leading: Icon(icon2),
             title: Text(title2, style: const TextStyle()),
             trailing: Switch(
               value: notificationEnabled,
@@ -346,7 +389,8 @@ class _ProfileSettingsScreenState
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Theme.of(context).colorScheme.surface,
+
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -360,7 +404,7 @@ class _ProfileSettingsScreenState
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(icon2, color: Colors.black),
+            leading: Icon(icon2),
             title: Text(title2, style: const TextStyle()),
 
             onTap: onTap2,
@@ -385,7 +429,8 @@ class _ProfileSettingsScreenState
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Theme.of(context).colorScheme.surface,
+
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -402,7 +447,7 @@ class _ProfileSettingsScreenState
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(icon2, color: Colors.black),
+            leading: Icon(icon2),
             title: Text(title2, style: const TextStyle()),
 
             onTap: onTap2,

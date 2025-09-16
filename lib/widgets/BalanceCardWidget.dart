@@ -10,7 +10,11 @@ class BalanceCard extends StatelessWidget {
       width: double.infinity,
       height: MediaQuery.of(context).size.width / 2,
       decoration: BoxDecoration(
-        color: Colors.black,
+        color:
+            Theme.of(context).brightness == Brightness.light
+            ? Colors
+                  .black // card in light mode
+            : Colors.grey[900], // card in dark mode
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

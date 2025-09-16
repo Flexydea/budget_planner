@@ -15,7 +15,9 @@ class MyListviewTile extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
@@ -33,13 +35,14 @@ class MyListviewTile extends StatelessWidget {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                color: Colors.white60,
                                 shape: BoxShape.circle,
                               ),
                             ),
                             FaIcon(
                               transactionData[i]['icon'],
-                              color: Colors.black,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface, // text/icon color
                             ),
                             // Icon(
                             //   Icons.food_bank,

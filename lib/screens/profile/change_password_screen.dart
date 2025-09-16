@@ -45,7 +45,6 @@ class _ChangePasswordScreenState
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey[200],
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscureCurrent
@@ -74,7 +73,6 @@ class _ChangePasswordScreenState
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey[200],
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscureNew
@@ -99,14 +97,19 @@ class _ChangePasswordScreenState
                   // Add your password change logic here
                 },
                 style: TextButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: Theme.of(context)
+                      .colorScheme
+                      .primary, // button background
+                  foregroundColor: Theme.of(context)
+                      .colorScheme
+                      .onPrimary, // text/icon color
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 child: const Text(
                   'Save',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(fontSize: 18),
                 ),
               ),
             ),

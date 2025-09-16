@@ -43,6 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       'assets/images/app_icon_raw.png',
                       width: 80,
                       height: 80,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface,
                     ),
                     const Text(
                       'Welcome back',
@@ -128,13 +131,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: () {
                                 context.go('/home');
                               },
-                              style: ElevatedButton.styleFrom(
+                              style: TextButton.styleFrom(
                                 backgroundColor:
-                                    Colors.black,
-                                padding:
-                                    const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .primary, // button background
+                                foregroundColor:
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .onPrimary, // text/icon color
                                 shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.circular(
@@ -144,9 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               child: const Text(
                                 'Login',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
+                                style: TextStyle(),
                               ),
                             ),
                           ),

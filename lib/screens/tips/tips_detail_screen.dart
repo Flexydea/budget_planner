@@ -11,15 +11,19 @@ class TipDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(
+        context,
+      ).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.background,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         title: Text(
           tip['title'] ?? '',
           style: const TextStyle(
-            color: Colors.black,
+            // color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -43,11 +47,15 @@ class TipDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface,
                     blurRadius: 0,
                     offset: const Offset(0, 4),
                   ),
@@ -70,7 +78,9 @@ class TipDetailScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15.5,
                       height: 2.0,
-                      color: Colors.black87,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 16),

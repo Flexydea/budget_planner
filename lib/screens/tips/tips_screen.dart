@@ -35,7 +35,9 @@ class _TipsScreenState extends State<TipsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(
+        context,
+      ).colorScheme.background,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -55,7 +57,9 @@ class _TipsScreenState extends State<TipsScreen> {
                 horizontal: 12,
               ),
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TextField(
@@ -105,7 +109,9 @@ class _TipsScreenState extends State<TipsScreen> {
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surface,
                         borderRadius: BorderRadius.circular(
                           16,
                         ),

@@ -38,7 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
               index = value;
             });
           },
-          selectedItemColor: Colors.black,
+          selectedItemColor: Theme.of(
+            context,
+          ).colorScheme.primary,
           showSelectedLabels: false,
           showUnselectedLabels: false,
           elevation: 3,
@@ -61,9 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButtonLocation:
           FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primary, // FAB background
+        foregroundColor: Theme.of(
+          context,
+        ).colorScheme.onPrimary, // auto icon/text color
         elevation: 8,
-        foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(16),
         ),
@@ -72,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: const Icon(
           CupertinoIcons.add,
-          color: Colors.white,
+          // color: Colors.white,
         ),
       ),
       body: index == 0

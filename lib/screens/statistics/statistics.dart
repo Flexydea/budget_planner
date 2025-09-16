@@ -42,7 +42,9 @@ class _MyStatisticsState extends State<MyStatistics> {
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surface,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -124,8 +126,11 @@ class _MyStatisticsState extends State<MyStatistics> {
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                 ),
+
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surface,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: InkWell(
@@ -182,46 +187,54 @@ class _MyStatisticsState extends State<MyStatistics> {
                 child: Row(
                   mainAxisAlignment:
                       MainAxisAlignment.spaceEvenly,
-                  children: ['Daily', 'Weekly', 'Monthly']
-                      .map((view) {
-                        final isSelected =
-                            selectedView == view;
+                  children: ['Daily', 'Weekly', 'Monthly'].map((
+                    view,
+                  ) {
+                    final isSelected = selectedView == view;
 
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedView = view;
-                            });
-                          },
-                          child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 8,
-                                ),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? Colors.black
-                                  : Colors.grey[200],
-                              borderRadius:
-                                  BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Colors.black12,
-                              ),
-                            ),
-                            child: Text(
-                              view,
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedView = view;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Theme.of(context)
+                                    .colorScheme
+                                    .primary // active background
+                              : Theme.of(context)
+                                    .colorScheme
+                                    .surface, // inactive background
+                          borderRadius:
+                              BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).dividerColor, // subtle divider/border
                           ),
-                        );
-                      })
-                      .toList(),
+                        ),
+                        child: Text(
+                          view,
+                          style: TextStyle(
+                            color: isSelected
+                                ? Theme.of(context)
+                                      .colorScheme
+                                      .onPrimary // text on active
+                                : Theme.of(context)
+                                      .colorScheme
+                                      .onSurface, // text on inactive
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
               const SizedBox(height: 20),
@@ -230,7 +243,9 @@ class _MyStatisticsState extends State<MyStatistics> {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
 
