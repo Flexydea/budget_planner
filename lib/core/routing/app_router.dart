@@ -1,4 +1,10 @@
+import 'package:budget_planner/screens/auth/login_screen.dart';
+import 'package:budget_planner/screens/auth/register_screen.dart';
 import 'package:budget_planner/screens/home/home_screen.dart';
+import 'package:budget_planner/screens/onboarding/OnboardingFlowScreen.dart';
+import 'package:budget_planner/screens/profile/privacy_policy.dart';
+import 'package:budget_planner/screens/profile/terms_and_condition.dart';
+import 'package:budget_planner/screens/splash/splash_screen.dart';
 import 'package:budget_planner/screens/tips/tips_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,7 +22,25 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => HomeScreen(),
+      // builder: (context, state) => const SplashScreen(),
+      builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) =>
+          const OnboardingFlowScreen(),
+    ),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => const HomeScreen(),
     ),
     GoRoute(
       path: '/tips/detail',
@@ -44,6 +68,16 @@ final GoRouter appRouter = GoRouter(
       path: '/settings/currency',
       builder: (context, state) =>
           const CurrencySelectorScreen(),
+    ),
+    GoRoute(
+      path: '/settings/privacy',
+      builder: (context, state) =>
+          const PrivacyPolicyScreen(),
+    ),
+    GoRoute(
+      path: '/settings/terms',
+      builder: (context, state) =>
+          const TermsConditionsScreen(),
     ),
     GoRoute(
       path: '/add-expense',

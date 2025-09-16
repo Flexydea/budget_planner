@@ -1,7 +1,6 @@
 // File: lib/screens/tips_screen.dart
 
 import 'package:budget_planner/models/data/data.dart';
-import 'package:budget_planner/screens/tips/tips_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

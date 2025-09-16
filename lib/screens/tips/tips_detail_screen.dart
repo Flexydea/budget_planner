@@ -1,6 +1,5 @@
 // File: lib/screens/tips/tip_detail_screen.dart
 
-import 'package:budget_planner/models/data/data.dart';
 import 'package:flutter/material.dart';
 
 class TipDetailScreen extends StatelessWidget {

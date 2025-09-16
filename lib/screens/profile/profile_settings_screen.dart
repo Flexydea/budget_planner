@@ -1,8 +1,4 @@
-import 'package:budget_planner/screens/profile/change_password_screen.dart';
-import 'package:budget_planner/screens/profile/currency_selector_screen.dart';
-import 'package:budget_planner/screens/profile/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
@@ -156,19 +152,28 @@ class _ProfileSettingsScreenState
             const SizedBox(height: 20),
             _buildSectionTitle('Legal'),
             _buildGroupedLegal(
-              icon1: Icons.delete_forever,
-              title1: 'Close account',
+              icon1: Icons.shield_outlined,
+              title1: 'Privacy policy',
               onTap1: () {
-                // Handle Edit Profile
+                context.push('/settings/privacy');
               },
-              icon2: Icons.logout,
-              title2: 'Logout',
+              icon2: Icons.description_outlined,
+              title2: 'Terms & condition',
               onTap2: () {
-                // Handle Change Password
+                context.push('/settings/terms');
               },
             ),
+            const SizedBox(height: 20),
+            // Close Account/ Logout
+            _buildGroupedCloseLogout(
+              icon1: Icons.delete_forever,
+              title1: 'Close account',
+              onTap1: () {},
+              icon2: Icons.logout,
+              title2: 'Logout',
+              onTap2: () {},
+            ),
 
-            /// Danger Zone
             const SizedBox(height: 30),
             Center(
               child: Column(
@@ -327,6 +332,45 @@ class _ProfileSettingsScreenState
   }
 
   Widget _buildGroupedLegal({
+    required IconData icon1,
+    required String title1,
+    required VoidCallback onTap1,
+    required IconData icon2,
+    required String title2,
+    required VoidCallback onTap2,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 8,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(icon1),
+            title: Text(title1),
+
+            onTap: onTap1,
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(icon2, color: Colors.black),
+            title: Text(title2, style: const TextStyle()),
+
+            onTap: onTap2,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupedCloseLogout({
     required IconData icon1,
     required String title1,
     required VoidCallback onTap1,

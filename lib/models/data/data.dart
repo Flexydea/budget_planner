@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 final List<Map<String, dynamic>> currencies = [
@@ -52,47 +50,44 @@ List<Map<String, dynamic>> transactionData = [
 ];
 
 List<Map<String, dynamic>> AvailableIcons = [
-  {'icon': FontAwesomeIcons.briefcase, 'name': 'work'},
-  {'icon': FontAwesomeIcons.person, 'name': 'person'},
-  {
-    'icon': FontAwesomeIcons.triangleExclamation,
-    'name': 'warning',
-  },
-  {
-    'icon': FontAwesomeIcons.dumbbell,
-    'name': 'fitness centre',
-  },
-  {'icon': FontAwesomeIcons.book, 'name': 'book'},
+  {'icon': FontAwesomeIcons.briefcase, 'name': ' Work'},
+  {'icon': FontAwesomeIcons.person, 'name': ' Self'},
+
+  {'icon': FontAwesomeIcons.dumbbell, 'name': ' Gym'},
+  {'icon': FontAwesomeIcons.book, 'name': ' Books'},
+  {'icon': FontAwesomeIcons.laptop, 'name': ' Tech'},
+  {'icon': FontAwesomeIcons.gamepad, 'name': ' Gaming'},
   {
     'icon': FontAwesomeIcons.graduationCap,
-    'name': 'Education',
+    'name': ' Education',
   },
-  {'icon': FontAwesomeIcons.burger, 'name': 'food'},
+  {'icon': FontAwesomeIcons.burger, 'name': ' Food'},
   {
     'icon': FontAwesomeIcons.bagShopping,
-    'name': 'Shopping',
+    'name': ' Shopping',
   },
-  {
-    'icon': FontAwesomeIcons.heartCircleCheck,
-    'name': 'Health',
-  },
-  {'icon': FontAwesomeIcons.car, 'name': 'Road Tax'},
-  {'icon': FontAwesomeIcons.plane, 'name': 'Travel'},
+  {'icon': FontAwesomeIcons.stethoscope, 'name': 'Health'},
+  {'icon': FontAwesomeIcons.car, 'name': ' Car'},
+  {'icon': FontAwesomeIcons.plane, 'name': ' Travel'},
   {
     'icon': FontAwesomeIcons.houseChimney,
-    'name': 'utilities',
+    'name': ' Utilities',
   },
-  {'icon': FontAwesomeIcons.mobile, 'name': 'pets'},
-  {'icon': FontAwesomeIcons.church, 'name': 'pets'},
-  {'icon': FontAwesomeIcons.film, 'name': 'pets'},
-  {'icon': FontAwesomeIcons.children, 'name': 'pets'},
-  {'icon': FontAwesomeIcons.mosque, 'name': 'pets'},
+  {'icon': FontAwesomeIcons.mobile, 'name': ' Mobile'},
+  {'icon': FontAwesomeIcons.church, 'name': ' Church'},
+  {'icon': FontAwesomeIcons.film, 'name': ' Film'},
+  {'icon': FontAwesomeIcons.children, 'name': ' Children'},
+  {'icon': FontAwesomeIcons.shoePrints, 'name': ' Fashion'},
+  {'icon': FontAwesomeIcons.ring, 'name': ' Jewelry'},
+  {'icon': FontAwesomeIcons.solidHeart, 'name': ' Date'},
+  {'icon': FontAwesomeIcons.seedling, 'name': ' Garden'},
+  {'icon': FontAwesomeIcons.mosque, 'name': ' Mosque'},
   {
     'icon': FontAwesomeIcons.moneyBillTrendUp,
-    'name': 'salary',
+    'name': ' Salary',
   },
-  {'icon': FontAwesomeIcons.gifts, 'name': 'gifts'},
-  {'icon': FontAwesomeIcons.paw, 'name': 'pets'},
+  {'icon': FontAwesomeIcons.gifts, 'name': ' Gifts'},
+  {'icon': FontAwesomeIcons.paw, 'name': ' Pets'},
 ];
 
 final List<Map<String, dynamic>> tips = [
