@@ -28,11 +28,12 @@ class MainScreen extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 22,
-                          backgroundColor: Colors.black,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.onSurface,
                           child: const Text(
                             'GI',
                             style: TextStyle(
-                              color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),

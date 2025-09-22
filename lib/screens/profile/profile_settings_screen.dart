@@ -84,7 +84,9 @@ class _ProfileSettingsScreenState
                         child: Icon(
                           Icons.camera_alt,
                           size: 8,
-                          color: Colors.black,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surface,
                         ),
                       ),
                     ),

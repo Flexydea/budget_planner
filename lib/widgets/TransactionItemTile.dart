@@ -40,14 +40,10 @@ class MyListviewTile extends StatelessWidget {
                             ),
                             FaIcon(
                               transactionData[i]['icon'],
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface, // text/icon color
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface,
                             ),
-                            // Icon(
-                            //   Icons.food_bank,
-                            //   color: Colors.white,
-                            // ),
                           ],
                         ),
                         SizedBox(width: 10),
