@@ -1,4 +1,5 @@
 import 'package:budget_planner/providers/auth_provider.dart';
+import 'package:budget_planner/screens/auth/widgets/close_account_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -213,7 +214,19 @@ class _ProfileSettingsScreenState
             _buildGroupedCloseLogout(
               icon1: Icons.delete_forever,
               title1: 'Close account',
-              onTap1: () {},
+              onTap1: () async {
+                final emailController =
+                    TextEditingController();
+                final passwordController =
+                    TextEditingController();
+
+                // Show confirmation dialog
+                showDialog(
+                  context: context,
+                  builder: (ctx) =>
+                      const CloseAccountDialog(),
+                );
+              },
               icon2: Icons.logout,
               title2: 'Logout',
               onTap2: () async {

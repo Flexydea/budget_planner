@@ -40,4 +40,16 @@ class AuthProvider with ChangeNotifier {
   Future<void> signOut() async {
     await _authService.signOut();
   }
+
+  Future<void> deleteAccount(
+    String email,
+    String password,
+  ) async {
+    await _authService.deleteAccount(
+      email: email,
+      password: password,
+    );
+    _user = null; // reset locally
+    notifyListeners();
+  }
 }

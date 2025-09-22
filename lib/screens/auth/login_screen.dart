@@ -1,3 +1,5 @@
+// File: auth/login_screen.dart
+import 'package:budget_planner/screens/auth/widgets/forgot_password_dialog.dart';
 import 'package:budget_planner/screens/auth/widgets/sign_in_options.dart';
 import 'package:budget_planner/providers/auth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart'
@@ -21,13 +23,14 @@ class _LoginScreenState extends State<LoginScreen> {
       TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
+  bool _loading = false;
 
   // Show error dialog
   void _showError(String message) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Error"),
+        title: const Text("Login Failed"),
         content: Text(message),
         actions: [
           TextButton(
@@ -49,6 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
+    setState(() => _loading = true); // 👈 start loading
+
     try {
       await context.read<AuthProvider>().signIn(
         email,
@@ -57,20 +62,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (mounted) context.go('/home');
     } on FirebaseAuthException catch (e) {
-      debugPrint(
-        "FirebaseAuthException code: ${e.code}, message: ${e.message}",
-      );
-      _showError("Login failed: ${e.message}");
       String message;
       switch (e.code) {
-        case 'user-not-found':
-          message = "No account found for this email.";
-          break;
-        case 'wrong-password':
-          message = "Incorrect password. Please try again.";
-          break;
         case 'invalid-email':
           message = "Invalid email format.";
+          break;
+        case 'wrong-password':
+        case 'user-not-found':
+          message =
+              "Invalid credentials. Please try again.";
           break;
         default:
           message = "Login failed: ${e.message}";
@@ -78,6 +78,11 @@ class _LoginScreenState extends State<LoginScreen> {
       _showError(message);
     } catch (e) {
       _showError("Something went wrong. Please try again.");
+    } finally {
+      if (mounted)
+        setState(
+          () => _loading = false,
+        ); // 👈 always stop loading
     }
   }
 
@@ -145,7 +150,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Alignment.centerRight,
                             child: TextButton(
                               onPressed: () {
-                                // TODO: Hook reset password later
+                                showDialog(
+                                  context: context,
+                                  builder: (_) =>
+                                      const ForgotPasswordDialog(),
+                                );
                               },
                               child: const Text(
                                 'Forgot password?',
@@ -202,8 +211,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: _login,
-                              style: TextButton.styleFrom(
+                              onPressed: _loading
+                                  ? null
+                                  : _login, // disable when loading
+                              style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(
                                   context,
                                 ).colorScheme.primary,
@@ -217,7 +228,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                 ),
                               ),
-                              child: const Text('Login'),
+                              child: _loading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors
+                                            .white, // 👈 always visible
+                                      ),
+                                    )
+                                  : Text(
+                                      "Login",
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary, // 👈 always correct contrast
+                                        fontWeight:
+                                            FontWeight.w600,
+                                      ),
+                                    ),
                             ),
                           ),
 

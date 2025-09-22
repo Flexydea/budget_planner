@@ -1,4 +1,6 @@
 import 'package:budget_planner/screens/auth/widgets/accept_terms_text.dart';
+import 'package:firebase_auth/firebase_auth.dart'
+    show FirebaseAuthException;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _acceptedTerms = false;
+  bool _loading = false;
 
   // Regex for password validation
   final RegExp _uppercase = RegExp(r'[A-Z]');
@@ -52,47 +55,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final confirmPassword = _confirmPasswordController.text
         .trim();
 
-    // 1. Terms must be accepted
+    //  Terms check
     if (!_acceptedTerms) {
       _showError("You must accept the terms to continue.");
       return;
     }
 
-    // 2. Passwords must match
+    //  Password match check
     if (password != confirmPassword) {
       _showError("Passwords do not match.");
       return;
     }
 
-    // 3. Password validation - collect missing rules
-    List<String> errors = [];
-    if (password.length < 6)
-      errors.add("at least 6 characters");
-    if (!_uppercase.hasMatch(password))
-      errors.add("an uppercase letter");
-    if (!_lowercase.hasMatch(password))
-      errors.add("a lowercase letter");
-    if (!_number.hasMatch(password)) errors.add("a number");
-    if (!_specialChar.hasMatch(password))
-      errors.add("a special character (!@#\$&*~)");
+    setState(() => _loading = true); // 👈 Start loading
 
-    if (errors.isNotEmpty) {
-      _showError(
-        "Password must include ${errors.join(', ')}.",
-      );
-      return;
-    }
-
-    // 4. Firebase sign up
     try {
+      //  Call provider
       await context.read<AuthProvider>().createAccount(
         email,
         password,
       );
+
       if (mounted)
-        context.go('/home'); // redirect if success
+        context.go('/home'); // Redirect if success
+    } on FirebaseAuthException catch (e) {
+      //  firebase errors handling
+      String message;
+      switch (e.code) {
+        case 'email-already-in-use':
+          message = "This email is already registered.";
+          break;
+        case 'invalid-email':
+          message = "Invalid email format.";
+          break;
+        case 'weak-password':
+          message =
+              "Password is too weak. Please choose a stronger one.";
+          break;
+        default:
+          message = "Registration failed: ${e.message}";
+      }
+      _showError(message);
     } catch (e) {
-      _showError("Registration failed: $e");
+      //  Any other unexpected error
+      _showError("Something went wrong. Please try again.");
+    } finally {
+      //  Always stop loading
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -101,7 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Invalid input"),
+        title: const Text("Error Message"),
         content: Text(message),
         actions: [
           TextButton(
@@ -223,7 +232,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _register,
+                      onPressed: _loading
+                          ? null
+                          : _register, // disable button while loading
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,
@@ -235,13 +246,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Create an account',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<
+                                      Color
+                                    >(Colors.white),
+                              ),
+                            )
+                          : const Text(
+                              'Create an account',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 20),
