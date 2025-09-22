@@ -1,7 +1,9 @@
 import 'package:budget_planner/screens/auth/widgets/accept_terms_text.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:budget_planner/core/theme/app_theme.dart'; // ✅ import your AppTheme
+import 'package:provider/provider.dart';
+import 'package:budget_planner/providers/auth_provider.dart';
+import 'package:budget_planner/core/theme/app_theme.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -12,16 +14,26 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  // Controllers for user input
   final TextEditingController _emailController =
       TextEditingController();
   final TextEditingController _passwordController =
       TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+
+  // UI flags
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _acceptedTerms = false;
 
+  // Regex for password validation
+  final RegExp _uppercase = RegExp(r'[A-Z]');
+  final RegExp _lowercase = RegExp(r'[a-z]');
+  final RegExp _number = RegExp(r'[0-9]');
+  final RegExp _specialChar = RegExp(r'[!@#\$&*~]');
+
+  // Toggle password visibility
   void _togglePasswordVisibility() {
     setState(() => _obscurePassword = !_obscurePassword);
   }
@@ -33,12 +45,72 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _register() {
-    if (_acceptedTerms &&
-        _passwordController.text ==
-            _confirmPasswordController.text) {
-      context.go('/home');
+  // Registration logic
+  Future<void> _register() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text
+        .trim();
+
+    // 1. Terms must be accepted
+    if (!_acceptedTerms) {
+      _showError("You must accept the terms to continue.");
+      return;
     }
+
+    // 2. Passwords must match
+    if (password != confirmPassword) {
+      _showError("Passwords do not match.");
+      return;
+    }
+
+    // 3. Password validation - collect missing rules
+    List<String> errors = [];
+    if (password.length < 6)
+      errors.add("at least 6 characters");
+    if (!_uppercase.hasMatch(password))
+      errors.add("an uppercase letter");
+    if (!_lowercase.hasMatch(password))
+      errors.add("a lowercase letter");
+    if (!_number.hasMatch(password)) errors.add("a number");
+    if (!_specialChar.hasMatch(password))
+      errors.add("a special character (!@#\$&*~)");
+
+    if (errors.isNotEmpty) {
+      _showError(
+        "Password must include ${errors.join(', ')}.",
+      );
+      return;
+    }
+
+    // 4. Firebase sign up
+    try {
+      await context.read<AuthProvider>().createAccount(
+        email,
+        password,
+      );
+      if (mounted)
+        context.go('/home'); // redirect if success
+    } catch (e) {
+      _showError("Registration failed: $e");
+    }
+  }
+
+  // Error popup dialog
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Invalid input"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -48,7 +120,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         scaffoldBackgroundColor: Colors.white,
       ),
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -58,11 +129,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
+
+                  // Logo
                   Image.asset(
                     'assets/images/app_icon_raw.png',
                     width: 80,
                     height: 80,
                   ),
+
                   const Text(
                     "Create an account",
                     style: TextStyle(
@@ -73,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 30),
 
-                  // Email
+                  // Email field
                   TextField(
                     controller: _emailController,
                     decoration: const InputDecoration(
@@ -85,7 +159,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Password
+                  // Password field
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -106,7 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Confirm Password
+                  // Confirm password field
                   TextField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
@@ -145,7 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Create account button
+                  // Register button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -172,7 +246,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Login
+                  // Link to login
                   Row(
                     mainAxisAlignment:
                         MainAxisAlignment.center,

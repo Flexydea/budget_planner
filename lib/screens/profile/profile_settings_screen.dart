@@ -1,3 +1,4 @@
+import 'package:budget_planner/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -215,7 +216,16 @@ class _ProfileSettingsScreenState
               onTap1: () {},
               icon2: Icons.logout,
               title2: 'Logout',
-              onTap2: () {},
+              onTap2: () async {
+                // Call signOut from AuthProvider
+                await context
+                    .read<AuthProvider>()
+                    .signOut();
+
+                if (mounted) {
+                  context.go('/login');
+                }
+              },
             ),
 
             const SizedBox(height: 30),

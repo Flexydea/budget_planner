@@ -1,9 +1,10 @@
-// File: auth/login_screen.dart
 import 'package:budget_planner/screens/auth/widgets/sign_in_options.dart';
+import 'package:budget_planner/providers/auth_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart'
+    show FirebaseAuthException;
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,10 +22,68 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _rememberMe = false;
 
+  // Show error dialog
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Error"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Login logic
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      _showError("Please enter both email and password.");
+      return;
+    }
+
+    try {
+      await context.read<AuthProvider>().signIn(
+        email,
+        password,
+      );
+
+      if (mounted) context.go('/home');
+    } on FirebaseAuthException catch (e) {
+      debugPrint(
+        "FirebaseAuthException code: ${e.code}, message: ${e.message}",
+      );
+      _showError("Login failed: ${e.message}");
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = "No account found for this email.";
+          break;
+        case 'wrong-password':
+          message = "Incorrect password. Please try again.";
+          break;
+        case 'invalid-email':
+          message = "Invalid email format.";
+          break;
+        default:
+          message = "Login failed: ${e.message}";
+      }
+      _showError(message);
+    } catch (e) {
+      _showError("Something went wrong. Please try again.");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(
@@ -39,6 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 40),
+
+                    // App icon
                     Image.asset(
                       'assets/images/app_icon_raw.png',
                       width: 80,
@@ -47,6 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         context,
                       ).colorScheme.onSurface,
                     ),
+
                     const Text(
                       'Welcome back',
                       style: TextStyle(
@@ -59,10 +121,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Please enter your details to login.',
                     ),
                     const SizedBox(height: 20),
+
+                    // Form fields
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
+                          // Email
                           TextFormField(
                             controller: _emailController,
                             decoration:
@@ -74,11 +139,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             keyboardType:
                                 TextInputType.emailAddress,
                           ),
+
                           Align(
                             alignment:
                                 Alignment.centerRight,
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                // TODO: Hook reset password later
+                              },
                               child: const Text(
                                 'Forgot password?',
                                 style: TextStyle(
@@ -88,6 +156,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
+
+                          // Password
                           TextFormField(
                             controller: _passwordController,
                             obscureText: _obscurePassword,
@@ -110,6 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
+
                           Row(
                             children: [
                               Checkbox(
@@ -124,22 +195,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               const Text('Remember me'),
                             ],
                           ),
+
                           const SizedBox(height: 10),
+
+                          // Login button
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () {
-                                context.go('/home');
-                              },
+                              onPressed: _login,
                               style: TextButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context)
-                                        .colorScheme
-                                        .primary, // button background
-                                foregroundColor:
-                                    Theme.of(context)
-                                        .colorScheme
-                                        .onPrimary, // text/icon color
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                                foregroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.circular(
@@ -147,19 +217,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                 ),
                               ),
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(),
-                              ),
+                              child: const Text('Login'),
                             ),
                           ),
+
                           const SizedBox(height: 40),
-                          SignInOptions(),
+
+                          SignInOptions(), // social logins
                         ],
                       ),
                     ),
-                    // const Spacer(),
+
                     const SizedBox(height: 20),
+
+                    // Register link
                     Row(
                       mainAxisAlignment:
                           MainAxisAlignment.center,
@@ -180,6 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 10),
                   ],
                 ),

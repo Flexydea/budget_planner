@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBUt8uy0gYn30frzSsNNF9BZXD_4xOxugI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>287098453835</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.budgetPlanner</string>
+	<key>PROJECT_ID</key>
+	<string>budget-planner-applicati-5514e</string>
+	<key>STORAGE_BUCKET</key>
+	<string>budget-planner-applicati-5514e.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:287098453835:ios:f5e4cf780e99ad5a3772ce</string>
+</dict>
+</plist>
