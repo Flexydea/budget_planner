@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart'
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,6 +25,24 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _rememberMe = false;
   bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedEmail();
+  }
+
+  Future<void> _loadSavedEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedEmail = prefs.getString("saved_email");
+
+    if (savedEmail != null) {
+      setState(() {
+        _emailController.text = savedEmail;
+        _rememberMe = true;
+      });
+    }
+  }
 
   // Show error dialog
   void _showError(String message) {
@@ -44,21 +63,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Login logic
   Future<void> _login() async {
+    final form = _formKey.currentState;
+    if (form == null || !form.validate()) return;
+
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      _showError("Please enter both email and password.");
-      return;
-    }
-
-    setState(() => _loading = true); // 👈 start loading
+    FocusScope.of(context).unfocus(); // dismiss keyboard
+    setState(() => _loading = true);
 
     try {
       await context.read<AuthProvider>().signIn(
         email,
         password,
       );
+      // remind me
+      final prefs = await SharedPreferences.getInstance();
+      if (_rememberMe) {
+        await prefs.setString("saved_email", email);
+      } else {
+        await prefs.remove("saved_email");
+      }
 
       if (mounted) context.go('/home');
     } on FirebaseAuthException catch (e) {
@@ -73,16 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
               "Invalid credentials. Please try again.";
           break;
         default:
-          message = "Login failed: ${e.message}";
+          message = "${e.message}";
       }
       _showError(message);
-    } catch (e) {
+    } catch (_) {
       _showError("Something went wrong. Please try again.");
     } finally {
-      if (mounted)
-        setState(
-          () => _loading = false,
-        ); // 👈 always stop loading
+      if (mounted) setState(() => _loading = false);
     }
   }
 

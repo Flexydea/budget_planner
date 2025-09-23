@@ -48,6 +48,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  // Account creation dialog
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Account creation"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Registration logic
   Future<void> _register() async {
     final email = _emailController.text.trim();
@@ -55,31 +72,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final confirmPassword = _confirmPasswordController.text
         .trim();
 
-    //  Terms check
+    if (email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      _showError(
+        "Please enter details to create an account",
+      );
+      return;
+    }
+
     if (!_acceptedTerms) {
       _showError("You must accept the terms to continue.");
       return;
     }
 
-    //  Password match check
     if (password != confirmPassword) {
       _showError("Passwords do not match.");
       return;
     }
 
-    setState(() => _loading = true); // 👈 Start loading
+    //  password errors
+    List<String> errors = [];
+    if (password.length < 8)
+      errors.add("at least 8 characters");
+    if (!_uppercase.hasMatch(password))
+      errors.add("an uppercase letter");
+    if (!_lowercase.hasMatch(password))
+      errors.add("a lowercase letter");
+    if (!_number.hasMatch(password)) errors.add("a number");
+    if (!_specialChar.hasMatch(password)) {
+      errors.add("a special character (!@#\$&*~)");
+    }
+
+    if (errors.isNotEmpty) {
+      _showError(
+        "Password must include ${errors.join(', ')}.",
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
 
     try {
-      //  Call provider
       await context.read<AuthProvider>().createAccount(
         email,
         password,
       );
-
-      if (mounted)
-        context.go('/home'); // Redirect if success
+      if (mounted) context.go('/home');
     } on FirebaseAuthException catch (e) {
-      //  firebase errors handling
       String message;
       switch (e.code) {
         case 'email-already-in-use':
@@ -97,29 +137,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
       _showError(message);
     } catch (e) {
-      //  Any other unexpected error
       _showError("Something went wrong. Please try again.");
     } finally {
-      //  Always stop loading
       if (mounted) setState(() => _loading = false);
     }
-  }
-
-  // Error popup dialog
-  void _showError(String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Error Message"),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
   }
 
   @override

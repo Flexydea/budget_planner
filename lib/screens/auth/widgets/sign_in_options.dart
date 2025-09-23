@@ -1,5 +1,8 @@
+import 'package:budget_planner/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class SignInOptions extends StatefulWidget {
   const SignInOptions({super.key});
@@ -42,34 +45,51 @@ class _SignInOptionsState extends State<SignInOptions> {
         ),
         const SizedBox(height: 20),
 
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[200],
-              padding: const EdgeInsets.symmetric(
-                vertical: 14,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            icon: const Icon(
-              Icons.apple,
-              color: Colors.black,
-            ),
-            label: const Text(
-              ' Continue with Apple',
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-        ),
+        // SizedBox(
+        //   width: double.infinity,
+        //   child: ElevatedButton.icon(
+        //     onPressed: () {},
+        //     style: ElevatedButton.styleFrom(
+        //       backgroundColor: Colors.grey[200],
+        //       padding: const EdgeInsets.symmetric(
+        //         vertical: 14,
+        //       ),
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.circular(10),
+        //       ),
+        //     ),
+        //     icon: const Icon(
+        //       Icons.apple,
+        //       color: Colors.black,
+        //     ),
+        //     label: const Text(
+        //       ' Continue with Apple',
+        //       style: TextStyle(color: Colors.black),
+        //     ),
+        //   ),
+        // ),
         const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () async {
+              try {
+                await context
+                    .read<AuthProvider>()
+                    .signInWithGoogle();
+                if (mounted) {
+                  context.go('/home');
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Google sign-in failed: $e",
+                    ),
+                  ),
+                );
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.grey[200],
               padding: const EdgeInsets.symmetric(
