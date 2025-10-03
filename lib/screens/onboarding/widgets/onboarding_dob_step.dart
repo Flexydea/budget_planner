@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingDobStep extends StatefulWidget {
   final DateTime selectedDate;
@@ -25,9 +26,11 @@ class _OnboardingDobStepState
   @override
   void initState() {
     super.initState();
-    _localDate = widget.selectedDate;
+    _localDate =
+        widget.selectedDate; // start with default date
   }
 
+  //opens date picker and updates local + parent
   Future<void> _pickDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -35,10 +38,23 @@ class _OnboardingDobStepState
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
+
     if (picked != null) {
       setState(() => _localDate = picked);
       widget.onDateChanged(picked);
     }
+  }
+
+  //Saves DOB to SharedPreferences
+  Future<void> _saveDobAndFinish() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      "user_dob",
+      _localDate.toIso8601String(),
+    );
+
+    // continue onboarding flow
+    widget.onFinish();
   }
 
   @override
@@ -47,7 +63,7 @@ class _OnboardingDobStepState
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Centered content
+          /// Centered DOB question
           Expanded(
             child: Center(
               child: Column(
@@ -61,6 +77,8 @@ class _OnboardingDobStepState
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  /// Tap to pick a date
                   GestureDetector(
                     onTap: _pickDate,
                     child: Container(
@@ -90,11 +108,13 @@ class _OnboardingDobStepState
               ),
             ),
           ),
-          // Finish button
+
+          /// Finish button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: widget.onFinish,
+              onPressed:
+                  _saveDobAndFinish, // Save and Finish
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(

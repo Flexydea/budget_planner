@@ -22,7 +22,7 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const LoginScreen(),
+      builder: (context, state) => const HomeScreen(),
       // builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(
@@ -36,7 +36,11 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/register',
-      builder: (context, state) => const RegisterScreen(),
+      builder: (context, state) {
+        final name =
+            state.extra as String?; // passed in onboarding
+        return RegisterScreen(name: name);
+      },
     ),
     GoRoute(
       path: '/home',

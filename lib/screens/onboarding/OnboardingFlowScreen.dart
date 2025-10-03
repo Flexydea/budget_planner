@@ -31,7 +31,10 @@ class _OnboardingFlowScreenState
         curve: Curves.easeInOut,
       );
     } else {
-      context.push('/register');
+      context.go(
+        '/register',
+        extra: _nameController.text.trim(),
+      );
     }
   }
 
