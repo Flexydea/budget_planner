@@ -7,13 +7,13 @@ class ThemeProvider extends ChangeNotifier {
   bool _isDarkMode = false;
   bool get isDarkMode => _isDarkMode;
 
-  ThemeProvider() {
-    _loadTheme();
-  }
-  Future<void> _loadTheme() async {
+  bool _isInitialized = false;
+  bool get isInitialized => _isInitialized;
+
+  Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    _isDarkMode =
-        prefs.getBool(_key) ?? false; //default light
+    _isDarkMode = prefs.getBool(_key) ?? false;
+    _isInitialized = true;
     notifyListeners();
   }
 

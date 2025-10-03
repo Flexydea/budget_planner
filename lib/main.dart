@@ -13,20 +13,20 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // AuthProvider
-  final authProvider = AuthProvider();
-  authProvider.init();
+  final themeProvider = ThemeProvider();
+  await themeProvider
+      .loadTheme(); // ✅ Wait before app starts
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => ThemeProvider(),
+          create: (_) => themeProvider,
         ),
         ChangeNotifierProvider(
           create: (_) {
             final authProvider = AuthProvider();
-            authProvider.init(); // listen to auth changes
+            authProvider.init();
             return authProvider;
           },
         ),

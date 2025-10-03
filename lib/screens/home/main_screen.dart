@@ -1,6 +1,8 @@
+import 'package:budget_planner/providers/theme_provider.dart';
 import 'package:budget_planner/services/user_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:budget_planner/widgets/BalanceCardWidget.dart';
 import 'package:budget_planner/widgets/TransactionItemTile.dart';
@@ -125,7 +127,11 @@ class _MainScreenState extends State<MainScreen> {
             ),
             const SizedBox(height: 20),
 
-            const MyListviewTile(),
+            Consumer<ThemeProvider>(
+              builder: (context, themeProvider, _) {
+                return MyListviewTile();
+              },
+            ),
           ],
         ),
       ),
