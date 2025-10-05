@@ -4,18 +4,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:budget_planner/app.dart';
 import 'package:budget_planner/providers/theme_provider.dart';
 import 'package:budget_planner/providers/auth_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('user_categories');
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   final themeProvider = ThemeProvider();
-  await themeProvider
-      .loadTheme(); // ✅ Wait before app starts
+  await themeProvider.loadTheme(); // Wait before app starts
 
   runApp(
     MultiProvider(

@@ -1,21 +1,21 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:budget_planner/models/data/data.dart';
+import 'package:budget_planner/utils/user_utils.dart';
 
 class OnboardingCategoryStep extends StatelessWidget {
-  final List<String> selectedTitles;
-  final Function(String) onToggleCategory;
+  final List<Map<String, dynamic>> selectedCategories;
+  final Function(Map<String, dynamic>) onToggleCategory;
   final VoidCallback onNext;
 
   const OnboardingCategoryStep({
     super.key,
-    required this.selectedTitles,
+    required this.selectedCategories,
     required this.onToggleCategory,
     required this.onNext,
   });
 
   bool _isSelected(String title) =>
-      selectedTitles.contains(title);
+      selectedCategories.any((cat) => cat['name'] == title);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,6 @@ class OnboardingCategoryStep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
           const Text(
             'What do you likely spend on the most?',
             style: TextStyle(
@@ -34,25 +33,27 @@ class OnboardingCategoryStep extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Select up to 6 categories   ${selectedTitles.length}/6',
+            'Select up to 6 categories  ${selectedCategories.length}/6',
             style: const TextStyle(
               color: Colors.grey,
               fontSize: 14,
             ),
           ),
           const SizedBox(height: 20),
+
+          // ✅ Category selection grid
           Expanded(
             child: SingleChildScrollView(
               child: Wrap(
                 spacing: 8,
                 runSpacing: 12,
                 children: AvailableIcons.map((category) {
-                  final IconData icon = category['icon'];
                   final String title = category['name'];
+                  final IconData icon = category['icon'];
                   final bool selected = _isSelected(title);
 
                   return GestureDetector(
-                    onTap: () => onToggleCategory(title),
+                    onTap: () => onToggleCategory(category),
                     child: AnimatedContainer(
                       duration: const Duration(
                         milliseconds: 200,
@@ -85,35 +86,15 @@ class OnboardingCategoryStep extends StatelessWidget {
                             size: 16,
                           ),
                           const SizedBox(width: 6),
-                          ConstrainedBox(
-                            constraints:
-                                const BoxConstraints(
-                                  maxWidth: 100,
-                                ),
-                            child: Text(
-                              title,
-                              overflow:
-                                  TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: selected
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          Text(
+                            title,
+                            style: TextStyle(
+                              color: selected
+                                  ? Colors.white
+                                  : Colors.black,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          if (selected)
-                            const Padding(
-                              padding: EdgeInsets.only(
-                                left: 6,
-                              ),
-                              child: Icon(
-                                CupertinoIcons
-                                    .clear_circled_solid,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ),
                         ],
                       ),
                     ),
@@ -123,11 +104,18 @@ class OnboardingCategoryStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
+
+          // ✅ Next button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: selectedTitles.isNotEmpty
-                  ? onNext
+              onPressed: selectedCategories.isNotEmpty
+                  ? () async {
+                      await saveUserCategories(
+                        selectedCategories,
+                      );
+                      onNext();
+                    }
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
@@ -143,7 +131,6 @@ class OnboardingCategoryStep extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
-                  fontSize: 16,
                 ),
               ),
             ),

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:budget_planner/utils/user_utils.dart';
 
 class AddExpense extends StatefulWidget {
   const AddExpense({super.key});
@@ -25,13 +26,21 @@ class _AddExpenseState extends State<AddExpense> {
   String? selectedCategory;
 
   final List<String> typeOptions = ['Income', 'Expense'];
+  List<Map<String, dynamic>> userCategories = [];
 
   @override
   void initState() {
     dateController.text = DateFormat(
       'dd/MM/yy',
     ).format(DateTime.now());
+    _loadUserCategories();
     super.initState();
+  }
+
+  Future<void> _loadUserCategories() async {
+    final list = await loadUserCategories();
+    if (!mounted) return;
+    setState(() => userCategories = list);
   }
 
   @override
@@ -147,7 +156,77 @@ class _AddExpenseState extends State<AddExpense> {
                 // Category field
                 TextFormField(
                   readOnly: true,
-                  onTap: () {},
+                  onTap: () async {
+                    // Only trigger dropdown if categories exist
+                    if (userCategories.isNotEmpty) {
+                      final selected =
+                          await showModalBottomSheet<
+                            Map<String, dynamic>
+                          >(
+                            context:
+                                context, // required parameter
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.surface,
+                            shape:
+                                const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.vertical(
+                                        top:
+                                            Radius.circular(
+                                              16,
+                                            ),
+                                      ),
+                                ),
+                            builder: (context) {
+                              return ListView(
+                                shrinkWrap: true,
+                                children: userCategories
+                                    .map((cat) {
+                                      return ListTile(
+                                        leading: Icon(
+                                          cat['icon'] ??
+                                              Icons
+                                                  .category,
+                                        ),
+                                        title: Text(
+                                          cat['name'],
+                                        ),
+                                        onTap: () =>
+                                            Navigator.pop(
+                                              context,
+                                              cat,
+                                            ),
+                                      );
+                                    })
+                                    .toList(),
+                              );
+                            },
+                          );
+
+                      if (selected != null) {
+                        setState(() {
+                          selectedCategory =
+                              selected['name'];
+                          categoryController.text =
+                              selected['name'];
+                          selectedIcon =
+                              selected['icon']; // optional
+                        });
+                      }
+                    } else {
+                      // If no categories found, show snackbar
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "No saved categories. Add one using +",
+                          ),
+                        ),
+                      );
+                    }
+                  },
                   controller: categoryController,
                   decoration: InputDecoration(
                     filled: true,
