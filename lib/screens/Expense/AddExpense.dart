@@ -88,7 +88,7 @@ class _AddExpenseState extends State<AddExpense> {
                   child: TextFormField(
                     controller: expenseController,
                     keyboardType:
-                        TextInputType.numberWithOptions(
+                        const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
                     textAlign: TextAlign.center,
@@ -113,7 +113,7 @@ class _AddExpenseState extends State<AddExpense> {
                 ),
                 const SizedBox(height: 45),
 
-                // Income or Expense selection field
+                // Income or Expense field (bottom sheet)
                 TextFormField(
                   readOnly: true,
                   controller: TextEditingController(
@@ -136,8 +136,6 @@ class _AddExpenseState extends State<AddExpense> {
                       borderSide: BorderSide.none,
                     ),
                   ),
-
-                  // When tapped → open sleek bottom sheet
                   onTap: () async {
                     final selected =
                         await showModalBottomSheet<String>(
@@ -177,8 +175,6 @@ class _AddExpenseState extends State<AddExpense> {
                                   const SizedBox(
                                     height: 16,
                                   ),
-
-                                  // List of Income / Expense
                                   ListTile(
                                     leading: const Icon(
                                       FontAwesomeIcons
@@ -209,31 +205,26 @@ class _AddExpenseState extends State<AddExpense> {
                                           'Expense',
                                         ),
                                   ),
-
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
                                 ],
                               ),
                             );
                           },
                         );
 
-                    // If user selected something
                     if (selected != null) {
-                      setState(() {
-                        selectedType = selected;
-                      });
+                      setState(
+                        () => selectedType = selected,
+                      );
                     }
                   },
                 ),
+
                 const SizedBox(height: 16),
 
                 // Category field
                 TextFormField(
                   readOnly: true,
                   onTap: () async {
-                    // Only open if categories exist
                     if (userCategories.isNotEmpty) {
                       final selected = await showModalBottomSheet<Map<String, dynamic>>(
                         context: context,
@@ -266,8 +257,6 @@ class _AddExpenseState extends State<AddExpense> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-
-                                // Grid of user categories
                                 GridView.builder(
                                   shrinkWrap: true,
                                   physics:
@@ -353,15 +342,12 @@ class _AddExpenseState extends State<AddExpense> {
                                     );
                                   },
                                 ),
-
-                                const SizedBox(height: 20),
                               ],
                             ),
                           );
                         },
                       );
 
-                      // When user selects one
                       if (selected != null) {
                         setState(() {
                           selectedCategory =
@@ -372,7 +358,6 @@ class _AddExpenseState extends State<AddExpense> {
                         });
                       }
                     } else {
-                      // No saved categories → snackbar
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(
@@ -395,11 +380,20 @@ class _AddExpenseState extends State<AddExpense> {
                       size: 16,
                     ),
                     suffixIcon: IconButton(
+                      icon: const Icon(
+                        FontAwesomeIcons.plus,
+                        size: 16,
+                      ),
                       onPressed: () {
                         showDialog(
                           context: context,
                           builder: (ctx) {
+                            final TextEditingController
+                            nameController =
+                                TextEditingController();
+                            IconData? pickedIcon;
                             bool isExpanded = false;
+
                             return StatefulBuilder(
                               builder: (context, setState) {
                                 return AlertDialog(
@@ -419,10 +413,9 @@ class _AddExpenseState extends State<AddExpense> {
                                       mainAxisSize:
                                           MainAxisSize.min,
                                       children: [
-                                        const SizedBox(
-                                          height: 16,
-                                        ),
                                         TextFormField(
+                                          controller:
+                                              nameController,
                                           decoration: InputDecoration(
                                             isDense: true,
                                             filled: true,
@@ -449,13 +442,11 @@ class _AddExpenseState extends State<AddExpense> {
                                           height: 16,
                                         ),
                                         TextFormField(
-                                          onTap: () {
-                                            setState(() {
-                                              isExpanded =
-                                                  !isExpanded;
-                                            });
-                                          },
                                           readOnly: true,
+                                          onTap: () => setState(
+                                            () => isExpanded =
+                                                !isExpanded,
+                                          ),
                                           textAlignVertical:
                                               TextAlignVertical
                                                   .center,
@@ -468,14 +459,12 @@ class _AddExpenseState extends State<AddExpense> {
                                                     )
                                                     .colorScheme
                                                     .surface,
-
-                                            //displays icon selected
                                             suffixIcon: Row(
                                               mainAxisSize:
                                                   MainAxisSize
                                                       .min,
                                               children: [
-                                                if (selectedIcon !=
+                                                if (pickedIcon !=
                                                     null)
                                                   Padding(
                                                     padding: const EdgeInsets.only(
@@ -483,7 +472,7 @@ class _AddExpenseState extends State<AddExpense> {
                                                           8.0,
                                                     ),
                                                     child: Icon(
-                                                      selectedIcon,
+                                                      pickedIcon,
                                                       size:
                                                           20,
                                                       color: Theme.of(
@@ -525,7 +514,7 @@ class _AddExpenseState extends State<AddExpense> {
                                                 decoration: BoxDecoration(
                                                   color: Theme.of(
                                                     context,
-                                                  ).colorScheme.surface, // card background
+                                                  ).colorScheme.surface,
                                                   borderRadius: const BorderRadius.vertical(
                                                     bottom:
                                                         Radius.circular(
@@ -547,7 +536,7 @@ class _AddExpenseState extends State<AddExpense> {
                                                     mainAxisSpacing:
                                                         8,
                                                     childAspectRatio:
-                                                        1, // square tiles
+                                                        1,
                                                   ),
                                                   itemBuilder:
                                                       (
@@ -559,58 +548,44 @@ class _AddExpenseState extends State<AddExpense> {
                                                         final iconData =
                                                             iconMap['icon']
                                                                 as IconData;
-                                                        final iconName =
-                                                            iconMap['name']
-                                                                as String;
-
                                                         return GestureDetector(
                                                           onTap: () {
                                                             setState(
                                                               () {
-                                                                selectedIcon = iconData;
+                                                                pickedIcon = iconData;
                                                                 isExpanded = false;
                                                               },
                                                             );
                                                           },
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.symmetric(
-                                                              horizontal: 8.0,
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                              borderRadius: BorderRadius.circular(
+                                                                5,
+                                                              ),
+                                                              border: Border.all(
+                                                                color:
+                                                                    pickedIcon ==
+                                                                        iconData
+                                                                    ? Theme.of(
+                                                                        context,
+                                                                      ).colorScheme.primary
+                                                                    : Theme.of(
+                                                                        context,
+                                                                      ).dividerColor,
+                                                                width:
+                                                                    pickedIcon ==
+                                                                        iconData
+                                                                    ? 2
+                                                                    : 1,
+                                                              ),
                                                             ),
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
+                                                            child: Center(
+                                                              child: Icon(
+                                                                iconData,
+                                                                size: 28,
                                                                 color: Theme.of(
                                                                   context,
-                                                                ).colorScheme.surface,
-                                                                borderRadius: BorderRadius.circular(
-                                                                  5,
-                                                                ),
-                                                                border: Border.all(
-                                                                  color:
-                                                                      selectedIcon ==
-                                                                          iconData
-                                                                      ? Theme.of(
-                                                                              context,
-                                                                            )
-                                                                            .colorScheme
-                                                                            .primary // highlight border
-                                                                      : Theme.of(
-                                                                          context,
-                                                                        ).dividerColor, // normal border
-                                                                  width:
-                                                                      selectedIcon ==
-                                                                          iconData
-                                                                      ? 2
-                                                                      : 1,
-                                                                ),
-                                                              ),
-                                                              child: Center(
-                                                                child: Icon(
-                                                                  iconData,
-                                                                  size: 30,
-                                                                  color: Theme.of(
-                                                                    context,
-                                                                  ).colorScheme.onSurface, // adapts text/icon
-                                                                ),
+                                                                ).colorScheme.onSurface,
                                                               ),
                                                             ),
                                                           ),
@@ -628,17 +603,66 @@ class _AddExpenseState extends State<AddExpense> {
                                           height:
                                               kToolbarHeight,
                                           child: TextButton(
-                                            onPressed:
-                                                () {},
+                                            onPressed: () async {
+                                              final name =
+                                                  nameController
+                                                      .text
+                                                      .trim();
+                                              if (name.isEmpty ||
+                                                  pickedIcon ==
+                                                      null) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content:
+                                                        Text(
+                                                          'Please enter a name and select an icon.',
+                                                        ),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+
+                                              final newCategory = {
+                                                'name':
+                                                    name,
+                                                'icon':
+                                                    pickedIcon,
+                                              };
+
+                                              userCategories
+                                                  .add(
+                                                    newCategory,
+                                                  );
+                                              await saveUserCategories(
+                                                userCategories,
+                                              );
+
+                                              await _loadUserCategories();
+                                              Navigator.pop(
+                                                context,
+                                              );
+
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    '$name category added!',
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                             style: TextButton.styleFrom(
                                               backgroundColor:
                                                   Theme.of(
                                                     context,
-                                                  ).colorScheme.primary, // button color
+                                                  ).colorScheme.primary,
                                               foregroundColor:
                                                   Theme.of(
                                                     context,
-                                                  ).colorScheme.onPrimary, // text/icon color
+                                                  ).colorScheme.onPrimary,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(
@@ -647,11 +671,12 @@ class _AddExpenseState extends State<AddExpense> {
                                               ),
                                             ),
                                             child: const Text(
-                                              'save',
-                                              style: TextStyle(
-                                                fontSize:
-                                                    22,
-                                              ), // no manual color
+                                              'Save',
+                                              style:
+                                                  TextStyle(
+                                                    fontSize:
+                                                        20,
+                                                  ),
                                             ),
                                           ),
                                         ),
@@ -664,10 +689,6 @@ class _AddExpenseState extends State<AddExpense> {
                           },
                         );
                       },
-                      icon: const Icon(
-                        FontAwesomeIcons.plus,
-                        size: 16,
-                      ),
                     ),
                     hintText: 'Category',
                     border: OutlineInputBorder(
@@ -706,21 +727,19 @@ class _AddExpenseState extends State<AddExpense> {
                   },
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Theme.of(context)
-                        .colorScheme
-                        .surface, //  adapts light/dark
+                    fillColor: Theme.of(
+                      context,
+                    ).colorScheme.surface,
                     prefixIcon: Icon(
                       FontAwesomeIcons.clock,
                       size: 16,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface, //  adapts icon color
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface,
                     ),
                     hintText: 'Date',
                     hintStyle: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).hintColor, // proper hint text color
+                      color: Theme.of(context).hintColor,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
@@ -740,12 +759,12 @@ class _AddExpenseState extends State<AddExpense> {
                   child: TextButton(
                     onPressed: () {},
                     style: TextButton.styleFrom(
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .primary, // button background
-                      foregroundColor: Theme.of(context)
-                          .colorScheme
-                          .onPrimary, // text/icon color
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primary,
+                      foregroundColor: Theme.of(
+                        context,
+                      ).colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           10,
@@ -754,9 +773,7 @@ class _AddExpenseState extends State<AddExpense> {
                     ),
                     child: const Text(
                       'Save',
-                      style: TextStyle(
-                        fontSize: 18,
-                      ), // no hardcoded color
+                      style: TextStyle(fontSize: 18),
                     ),
                   ),
                 ),
