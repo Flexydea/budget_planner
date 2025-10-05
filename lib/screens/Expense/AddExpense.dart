@@ -113,25 +113,12 @@ class _AddExpenseState extends State<AddExpense> {
                 ),
                 const SizedBox(height: 45),
 
-                // Income or Expense dropdown
-                DropdownButtonFormField<String>(
-                  value: selectedType,
-                  style: TextStyle(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface,
+                // Income or Expense selection field
+                TextFormField(
+                  readOnly: true,
+                  controller: TextEditingController(
+                    text: selectedType ?? '',
                   ),
-                  items: typeOptions.map((type) {
-                    return DropdownMenuItem<String>(
-                      value: type,
-                      child: Text(type),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedType = value!;
-                    });
-                  },
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Theme.of(
@@ -149,73 +136,243 @@ class _AddExpenseState extends State<AddExpense> {
                       borderSide: BorderSide.none,
                     ),
                   ),
-                ),
 
+                  // When tapped → open sleek bottom sheet
+                  onTap: () async {
+                    final selected =
+                        await showModalBottomSheet<String>(
+                          context: context,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.surface,
+                          shape:
+                              const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.vertical(
+                                      top: Radius.circular(
+                                        20,
+                                      ),
+                                    ),
+                              ),
+                          builder: (context) {
+                            return Padding(
+                              padding: const EdgeInsets.all(
+                                16,
+                              ),
+                              child: Column(
+                                mainAxisSize:
+                                    MainAxisSize.min,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
+                                children: [
+                                  const Text(
+                                    'Select Type',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight:
+                                          FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 16,
+                                  ),
+
+                                  // List of Income / Expense
+                                  ListTile(
+                                    leading: const Icon(
+                                      FontAwesomeIcons
+                                          .arrowUp,
+                                      color: Colors.green,
+                                    ),
+                                    title: const Text(
+                                      'Income',
+                                    ),
+                                    onTap: () =>
+                                        Navigator.pop(
+                                          context,
+                                          'Income',
+                                        ),
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(
+                                      FontAwesomeIcons
+                                          .arrowDown,
+                                      color: Colors.red,
+                                    ),
+                                    title: const Text(
+                                      'Expense',
+                                    ),
+                                    onTap: () =>
+                                        Navigator.pop(
+                                          context,
+                                          'Expense',
+                                        ),
+                                  ),
+
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+
+                    // If user selected something
+                    if (selected != null) {
+                      setState(() {
+                        selectedType = selected;
+                      });
+                    }
+                  },
+                ),
                 const SizedBox(height: 16),
 
                 // Category field
                 TextFormField(
                   readOnly: true,
                   onTap: () async {
-                    // Only trigger dropdown if categories exist
+                    // Only open if categories exist
                     if (userCategories.isNotEmpty) {
-                      final selected =
-                          await showModalBottomSheet<
-                            Map<String, dynamic>
-                          >(
-                            context:
-                                context, // required parameter
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.surface,
-                            shape:
-                                const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.vertical(
-                                        top:
-                                            Radius.circular(
-                                              16,
-                                            ),
-                                      ),
+                      final selected = await showModalBottomSheet<Map<String, dynamic>>(
+                        context: context,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.surface,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(
+                                top: Radius.circular(20),
+                              ),
+                        ),
+                        builder: (context) {
+                          return Padding(
+                            padding: const EdgeInsets.all(
+                              16,
+                            ),
+                            child: Column(
+                              mainAxisSize:
+                                  MainAxisSize.min,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Select Category',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight:
+                                        FontWeight.w600,
+                                  ),
                                 ),
-                            builder: (context) {
-                              return ListView(
-                                shrinkWrap: true,
-                                children: userCategories
-                                    .map((cat) {
-                                      return ListTile(
-                                        leading: Icon(
-                                          cat['icon'] ??
-                                              Icons
-                                                  .category,
-                                        ),
-                                        title: Text(
-                                          cat['name'],
-                                        ),
-                                        onTap: () =>
-                                            Navigator.pop(
-                                              context,
-                                              cat,
-                                            ),
-                                      );
-                                    })
-                                    .toList(),
-                              );
-                            },
-                          );
+                                const SizedBox(height: 16),
 
+                                // Grid of user categories
+                                GridView.builder(
+                                  shrinkWrap: true,
+                                  physics:
+                                      const NeverScrollableScrollPhysics(),
+                                  itemCount:
+                                      userCategories.length,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        mainAxisSpacing: 16,
+                                        crossAxisSpacing:
+                                            16,
+                                      ),
+                                  itemBuilder: (context, index) {
+                                    final cat =
+                                        userCategories[index];
+                                    return GestureDetector(
+                                      onTap: () =>
+                                          Navigator.pop(
+                                            context,
+                                            cat,
+                                          ),
+                                      child: Column(
+                                        mainAxisSize:
+                                            MainAxisSize
+                                                .min,
+                                        children: [
+                                          Container(
+                                            padding:
+                                                const EdgeInsets.all(
+                                                  14,
+                                                ),
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.background,
+                                              shape: BoxShape
+                                                  .circle,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors
+                                                      .black
+                                                      .withOpacity(
+                                                        0.05,
+                                                      ),
+                                                  blurRadius:
+                                                      4,
+                                                  offset:
+                                                      const Offset(
+                                                        0,
+                                                        2,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Icon(
+                                              cat['icon'] ??
+                                                  Icons
+                                                      .category,
+                                              size: 22,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 8,
+                                          ),
+                                          Text(
+                                            cat['name'],
+                                            overflow:
+                                                TextOverflow
+                                                    .ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+
+                                const SizedBox(height: 20),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+
+                      // When user selects one
                       if (selected != null) {
                         setState(() {
                           selectedCategory =
                               selected['name'];
+                          selectedIcon = selected['icon'];
                           categoryController.text =
                               selected['name'];
-                          selectedIcon =
-                              selected['icon']; // optional
                         });
                       }
                     } else {
-                      // If no categories found, show snackbar
+                      // No saved categories → snackbar
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(
