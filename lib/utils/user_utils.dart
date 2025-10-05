@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:budget_planner/models/data/data.dart';
 
-const _kUserCategoriesKey =
-    'user_categories'; // keeping same key for compatibility
+///  Prefix for per-user category storage
+const String _kUserCategoriesKeyPrefix = 'user_categories_';
 
-// Encode IconData into a JSON-friendly map.
+/// Holds the currently active user ID (defaults to demo for testing)
+String currentUserId = 'demo_user';
+
 Map<String, dynamic>? _encodeIconData(IconData? icon) {
   if (icon == null) return null;
   return {
@@ -17,12 +19,8 @@ Map<String, dynamic>? _encodeIconData(IconData? icon) {
   };
 }
 
-// Decode IconData back from map (null-safe).
-IconData? _decodeIconData(dynamic data) {
-  if (data == null) return null;
-  if (data is! Map) return null;
-
-  final map = Map<String, dynamic>.from(data);
+IconData? _decodeIconData(Map<String, dynamic>? map) {
+  if (map == null) return null;
   final cp = map['codePoint'];
   if (cp is! int) return null;
 
@@ -30,123 +28,124 @@ IconData? _decodeIconData(dynamic data) {
     cp,
     fontFamily: map['fontFamily'] as String?,
     fontPackage: map['fontPackage'] as String?,
-    matchTextDirection:
-        (map['matchTextDirection'] as bool?) ?? false,
+    matchTextDirection: map['matchTextDirection'] ?? false,
   );
 }
 
-//  Save full list (each item: {name: String, icon: IconData}).
-Future<void> saveUserCategories(
-  List<Map<String, dynamic>> categories,
+///  Save user categories (per specific user)
+Future<void> saveUserCategoriesForUser(
+  String userId,
+  List<Map<String, dynamic>> selected,
 ) async {
   final prefs = await SharedPreferences.getInstance();
 
-  // Normalize + encode icons
-  final encoded = categories.map((c) {
-    final String name = (c['name'] ?? '').toString();
-    final IconData? icon = c['icon'] as IconData?;
-    return {'name': name, 'icon': _encodeIconData(icon)};
+  final encoded = selected.map((cat) {
+    final icon = cat['icon'];
+    return {
+      'name': cat['name'],
+      'icon': _encodeIconData(
+        icon is IconData ? icon : null,
+      ),
+    };
   }).toList();
 
   await prefs.setString(
-    _kUserCategoriesKey,
+    '$_kUserCategoriesKeyPrefix$userId',
     jsonEncode(encoded),
   );
 }
 
-//  Load list back as {name: String, icon: IconData}. Handles legacy formats and migrates them.
+///  Load categories for a given user
 Future<List<Map<String, dynamic>>>
-loadUserCategories() async {
+loadUserCategoriesForUser(String userId) async {
   final prefs = await SharedPreferences.getInstance();
+  final saved = prefs.getString(
+    '$_kUserCategoriesKeyPrefix$userId',
+  );
 
-  //  Try to detect legacy StringList format safely
-  try {
-    final legacyList = prefs.getStringList(
-      _kUserCategoriesKey,
-    );
-    if (legacyList != null) {
-      // Map legacy names → icons
-      final result = legacyList.map<Map<String, dynamic>>((
-        name,
-      ) {
-        final clean = name.trim().toLowerCase();
-        final match = AvailableIcons.firstWhere(
-          (m) =>
-              (m['name'] as String).trim().toLowerCase() ==
-              clean,
-          orElse: () => {
-            'icon': Icons.category,
-            'name': name,
-          },
-        );
-        return {
-          'name': name,
-          'icon':
-              match['icon'] as IconData? ?? Icons.category,
-        };
-      }).toList();
-
-      // Migrate to new format
-      await saveUserCategories(result);
-      await prefs.remove(_kUserCategoriesKey);
-      return result;
-    }
-  } catch (_) {
-    // If getStringList throws (old format stored as String)
-  }
-
-  // 👇 Step 2: Handle new JSON format
-  final saved = prefs.getString(_kUserCategoriesKey);
   if (saved == null) return [];
 
-  final List decoded;
-  try {
-    decoded = jsonDecode(saved) as List;
-  } catch (_) {
-    // Corrupt or mismatched format, clear it
-    await prefs.remove(_kUserCategoriesKey);
-    return [];
-  }
-
-  final result = decoded.map<Map<String, dynamic>>((item) {
-    final map = Map<String, dynamic>.from(item as Map);
-    final String name = (map['name'] ?? '').toString();
-    IconData? icon = _decodeIconData(map['icon']);
-
-    if (icon == null) {
-      final clean = name.trim().toLowerCase();
-      final match = AvailableIcons.firstWhere(
-        (m) =>
-            (m['name'] as String).trim().toLowerCase() ==
-            clean,
-        orElse: () => {'icon': Icons.category},
-      );
-      icon = match['icon'] as IconData? ?? Icons.category;
-    }
-
-    return {'name': name, 'icon': icon};
+  final List decoded = jsonDecode(saved);
+  return decoded.map<Map<String, dynamic>>((item) {
+    final name = item['name'] ?? '';
+    final iconMap = item['icon'];
+    final iconData = (iconMap is Map)
+        ? _decodeIconData(
+            Map<String, dynamic>.from(iconMap),
+          )
+        : _findDefaultIcon(name);
+    return {'name': name, 'icon': iconData};
   }).toList();
-
-  // Re-save in the new structure
-  await saveUserCategories(result);
-  return result;
 }
 
-// Helper to append a single category (prevents duplicates by name).
+/// 🔍 Fallback icon
+IconData _findDefaultIcon(String name) {
+  final match = AvailableIcons.firstWhere(
+    (m) =>
+        (m['name'] as String).trim().toLowerCase() ==
+        name.trim().toLowerCase(),
+    orElse: () => {'icon': Icons.category},
+  );
+  return match['icon'] as IconData;
+}
+
+///  Add a new category for the current user (avoid duplicates)
 Future<void> addUserCategory({
   required String name,
   required IconData icon,
 }) async {
-  final list = await loadUserCategories();
+  final list = await loadUserCategoriesForUser(
+    currentUserId,
+  );
 
-  // prevent duplicates (case-insensitive trim)
   final exists = list.any(
     (c) =>
         (c['name'] as String).trim().toLowerCase() ==
         name.trim().toLowerCase(),
   );
+
   if (!exists) {
     list.add({'name': name.trim(), 'icon': icon});
-    await saveUserCategories(list);
+    await saveUserCategoriesForUser(currentUserId, list);
   }
+}
+
+Future<void> setCurrentUser(String userId) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('current_user', userId);
+  currentUserId = userId;
+  // debugPrint('👤 Current user set: $userId');
+}
+
+Future<void> loadCurrentUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  currentUserId =
+      prefs.getString('current_user') ?? 'demo_user';
+}
+
+Future<void> logoutUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('current_user');
+  currentUserId = 'demo_user';
+  // debugPrint('👋 User logged out. Reset to demo_user.');
+}
+
+/// Move categories from demo_user (onboarding) to the actual user UID after registration.
+Future<void> migrateDemoCategoriesToUser(
+  String userId,
+) async {
+  final prefs = await SharedPreferences.getInstance();
+  final demoList = await loadUserCategoriesForUser(
+    'demo_user',
+  );
+  if (demoList.isEmpty) return;
+
+  // Save under real user ID
+  await saveUserCategoriesForUser(userId, demoList);
+
+  // Clean up demo cache
+  await prefs.remove(
+    '${_kUserCategoriesKeyPrefix}demo_user',
+  );
+  // debugPrint(' Migrated onboarding categories to $userId');
 }

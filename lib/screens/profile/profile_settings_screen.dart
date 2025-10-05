@@ -2,6 +2,7 @@ import 'package:budget_planner/providers/auth_provider.dart'
     as custom_auth;
 import 'package:budget_planner/screens/auth/widgets/close_account_dialog.dart';
 import 'package:budget_planner/services/user_prefs.dart';
+import 'package:budget_planner/utils/user_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -245,9 +246,15 @@ class _ProfileSettingsScreenState
               icon2: Icons.logout,
               title2: 'Logout',
               onTap2: () async {
+                // 1️⃣ Sign out from Firebase
                 await context
                     .read<custom_auth.AuthProvider>()
                     .signOut();
+
+                // 2️⃣ Reset locally stored user data (categories, userId, etc.)
+                await logoutUser(); // from user_utils.dart
+
+                // 3️⃣ Redirect to login screen
                 if (mounted) context.go('/login');
               },
             ),

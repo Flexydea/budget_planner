@@ -10,6 +10,8 @@ class AuthProvider with ChangeNotifier {
   User? _user;
 
   User? get user => _user;
+  User? get currentUser =>
+      FirebaseAuth.instance.currentUser;
 
   // Listen to auth changes
   void init() {

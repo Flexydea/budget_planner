@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:budget_planner/models/data/data.dart';
 import 'package:budget_planner/utils/user_utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class OnboardingCategoryStep extends StatelessWidget {
   final List<Map<String, dynamic>> selectedCategories;
@@ -44,6 +46,7 @@ class OnboardingCategoryStep extends StatelessWidget {
           // ✅ Category selection grid
           Expanded(
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Wrap(
                 spacing: 8,
                 runSpacing: 12,
@@ -56,7 +59,7 @@ class OnboardingCategoryStep extends StatelessWidget {
                     onTap: () => onToggleCategory(category),
                     child: AnimatedContainer(
                       duration: const Duration(
-                        milliseconds: 200,
+                        milliseconds: 180,
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -70,9 +73,11 @@ class OnboardingCategoryStep extends StatelessWidget {
                           20,
                         ),
                         border: Border.all(
-                          color: Colors.black.withOpacity(
-                            0.3,
-                          ),
+                          color: selected
+                              ? Colors.black
+                              : Colors.black.withOpacity(
+                                  0.3,
+                                ),
                         ),
                       ),
                       child: Row(
@@ -103,6 +108,7 @@ class OnboardingCategoryStep extends StatelessWidget {
               ),
             ),
           ),
+
           const SizedBox(height: 20),
 
           // ✅ Next button
@@ -111,10 +117,14 @@ class OnboardingCategoryStep extends StatelessWidget {
             child: ElevatedButton(
               onPressed: selectedCategories.isNotEmpty
                   ? () async {
-                      await saveUserCategories(
+                      await loadCurrentUser();
+                      final userId =
+                          currentUserId ?? 'demo_user';
+                      await saveUserCategoriesForUser(
+                        userId,
                         selectedCategories,
                       );
-                      onNext();
+                      onNext(); // continue to the name/date step
                     }
                   : null,
               style: ElevatedButton.styleFrom(
@@ -131,6 +141,7 @@ class OnboardingCategoryStep extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
+                  fontSize: 16,
                 ),
               ),
             ),

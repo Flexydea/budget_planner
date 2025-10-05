@@ -1,7 +1,8 @@
 import 'package:budget_planner/screens/auth/widgets/accept_terms_text.dart';
 import 'package:budget_planner/services/user_prefs.dart';
+import 'package:budget_planner/utils/user_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuthException;
+    show FirebaseAuthException, FirebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -75,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final confirmPassword = _confirmPasswordController.text
         .trim();
 
-    // 1. Validate inputs
+    // 1️⃣ Validate inputs
     if (email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
@@ -93,7 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // 2. Check password rules
+    // 2️⃣ Password strength check
     List<String> errors = [];
     if (password.length < 8)
       errors.add("at least 8 characters");
@@ -104,7 +105,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_number.hasMatch(password)) errors.add("a number");
     if (!_specialChar.hasMatch(password))
       errors.add("a special character (!@#\$&*~)");
-
     if (errors.isNotEmpty) {
       _showError(
         "Password must include ${errors.join(', ')}.",
@@ -115,18 +115,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _loading = true);
 
     try {
-      // 3. Create Firebase account
+      // 3️⃣ Create Firebase account
       await context.read<AuthProvider>().createAccount(
         email,
         password,
       );
 
-      // 4. Save user name tied to current UID
+      // 4️⃣ Get current Firebase user
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        // ✅ Set this new user as current and migrate demo data
+        await setCurrentUser(user.uid);
+        await migrateDemoCategoriesToUser(user.uid);
+      }
+
+      // 5️⃣ Save display name
       await saveUserName((widget.name ?? "User").trim());
-      // 5. Navigate to home
+
+      // 6️⃣ Navigate straight to home
       if (mounted) context.go('/home');
     } on FirebaseAuthException catch (e) {
-      // 6. Handle Firebase errors
       String message;
       switch (e.code) {
         case 'email-already-in-use':
@@ -136,8 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           message = "Invalid email format.";
           break;
         case 'weak-password':
-          message =
-              "Password is too weak. Please choose a stronger one.";
+          message = "Password is too weak.";
           break;
         default:
           message = "Registration failed: ${e.message}";

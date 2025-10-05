@@ -3,11 +3,12 @@ import 'package:budget_planner/screens/auth/widgets/forgot_password_dialog.dart'
 import 'package:budget_planner/screens/auth/widgets/sign_in_options.dart';
 import 'package:budget_planner/providers/auth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuthException;
+    show FirebaseAuthException, FirebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:budget_planner/utils/user_utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -69,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    FocusScope.of(context).unfocus(); // dismiss keyboard
+    FocusScope.of(context).unfocus();
     setState(() => _loading = true);
 
     try {
@@ -77,7 +78,16 @@ class _LoginScreenState extends State<LoginScreen> {
         email,
         password,
       );
-      // remind me
+
+      // ✅ Get the logged-in Firebase user
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await setCurrentUser(
+          user.uid,
+        ); // store unique user ID
+      }
+
+      // ✅ Handle remember-me
       final prefs = await SharedPreferences.getInstance();
       if (_rememberMe) {
         await prefs.setString("saved_email", email);
@@ -85,6 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.remove("saved_email");
       }
 
+      // ✅ Navigate to home
       if (mounted) context.go('/home');
     } on FirebaseAuthException catch (e) {
       String message;
@@ -98,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
               "Invalid credentials. Please try again.";
           break;
         default:
-          message = "${e.message}";
+          message = e.message ?? "Authentication error.";
       }
       _showError(message);
     } catch (_) {
