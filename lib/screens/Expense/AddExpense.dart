@@ -13,7 +13,9 @@ class AddExpense extends StatefulWidget {
 }
 
 class _AddExpenseState extends State<AddExpense> {
-  // ✅ Controllers
+  //  Controllers
+  final TextEditingController descriptionController =
+      TextEditingController();
   final TextEditingController expenseController =
       TextEditingController();
   final TextEditingController categoryController =
@@ -21,11 +23,12 @@ class _AddExpenseState extends State<AddExpense> {
   final TextEditingController dateController =
       TextEditingController();
 
-  // ✅ State variables
+  //  State variables
   DateTime selectDate = DateTime.now();
   String? selectedType;
   IconData? selectedIcon;
   String? selectedCategory;
+
   List<Map<String, dynamic>> userCategories = [];
 
   @override
@@ -37,7 +40,7 @@ class _AddExpenseState extends State<AddExpense> {
     _loadUserCategories(); // Load per-user data
   }
 
-  /// ✅ Load categories for the current user
+  ///  Load categories for the current user
   Future<void> _loadUserCategories() async {
     await loadCurrentUser(); // ensures currentUserId is ready
     final list = await loadUserCategoriesForUser(
@@ -83,7 +86,7 @@ class _AddExpenseState extends State<AddExpense> {
               ),
               const SizedBox(height: 16),
 
-              // ✅ Amount field
+              //  Amount field
               SizedBox(
                 width:
                     MediaQuery.of(context).size.width * 0.5,
@@ -115,7 +118,7 @@ class _AddExpenseState extends State<AddExpense> {
               ),
               const SizedBox(height: 45),
 
-              // ✅ Type picker
+              //  Type picker
               TextFormField(
                 readOnly: true,
                 controller: TextEditingController(
@@ -202,7 +205,7 @@ class _AddExpenseState extends State<AddExpense> {
               ),
               const SizedBox(height: 16),
 
-              // ✅ Category picker
+              //  Category picker
               TextFormField(
                 readOnly: true,
                 controller: categoryController,
@@ -374,8 +377,31 @@ class _AddExpenseState extends State<AddExpense> {
               ),
 
               const SizedBox(height: 16),
+              //description
+              TextFormField(
+                controller: descriptionController,
+                textCapitalization:
+                    TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  hintText:
+                      'Description (e.g. Burger, Uber Ride)',
+                  prefixIcon: const Icon(
+                    Icons.description_outlined,
+                    size: 18,
+                  ),
+                  filled: true,
+                  fillColor: Theme.of(
+                    context,
+                  ).colorScheme.surface,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
 
-              // ✅ Date picker
+              //  Date picker
               TextFormField(
                 controller: dateController,
                 readOnly: true,
@@ -418,8 +444,7 @@ class _AddExpenseState extends State<AddExpense> {
               ),
 
               const SizedBox(height: 20),
-
-              // ✅ Save Expense button
+              //  Save Expense button
               SizedBox(
                 width: double.infinity,
                 height: kToolbarHeight,
@@ -451,7 +476,7 @@ class _AddExpenseState extends State<AddExpense> {
     );
   }
 
-  /// ✅ Add Category Dialog
+  ///  Add Category Dialog
   void _showAddCategoryDialog() {
     final TextEditingController nameController =
         TextEditingController();
@@ -495,7 +520,7 @@ class _AddExpenseState extends State<AddExpense> {
                 ),
                 const SizedBox(height: 16),
 
-                // ✅ Icon picker
+                //  Icon picker
                 TextFormField(
                   readOnly: true,
                   onTap: () => setState(
@@ -611,7 +636,7 @@ class _AddExpenseState extends State<AddExpense> {
                   ),
                 const SizedBox(height: 20),
 
-                // ✅ Save button
+                //  Save button
                 SizedBox(
                   width: double.infinity,
                   height: kToolbarHeight,

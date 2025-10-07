@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:budget_planner/screens/Expense/AddExpense.dart';
+import 'package:budget_planner/screens/category/category_tab.dart';
 import 'package:budget_planner/screens/home/main_screen.dart';
 import 'package:budget_planner/screens/statistics/statistics.dart';
 import 'package:budget_planner/screens/tips/tips_screen.dart';
@@ -16,42 +15,49 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  var widgetScreenList = [
+  int index = 0;
+
+  final widgetScreenList = [
     MainScreen(),
     MyStatistics(),
+    CategoryTab(),
     TipsScreen(),
   ];
-
-  int index = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: widgetScreenList[index],
       bottomNavigationBar: ClipRRect(
-        borderRadius: BorderRadius.vertical(
+        borderRadius: const BorderRadius.vertical(
           top: Radius.circular(30),
         ),
         child: BottomNavigationBar(
           currentIndex: index,
-          onTap: (value) {
-            setState(() {
-              index = value;
-            });
-          },
+          onTap: (value) => setState(() => index = value),
           selectedItemColor: Theme.of(
             context,
           ).colorScheme.primary,
+          unselectedItemColor: Colors.grey,
           showSelectedLabels: false,
           showUnselectedLabels: false,
+          type: BottomNavigationBarType.fixed,
           elevation: 3,
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.surface,
           items: const [
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.home),
-              label: 'home',
+              label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.chart_bar),
-              label: 'statistics',
+              label: 'Statistics',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.square_grid_2x2),
+              label: 'Categories',
             ),
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.lightbulb),
@@ -65,27 +71,17 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(
           context,
-        ).colorScheme.primary, // FAB background
+        ).colorScheme.primary,
         foregroundColor: Theme.of(
           context,
-        ).colorScheme.onPrimary, // auto icon/text color
+        ).colorScheme.onPrimary,
         elevation: 8,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(16),
+          borderRadius: BorderRadius.circular(16),
         ),
-        onPressed: () {
-          context.push('/add-expense');
-        },
-        child: const Icon(
-          CupertinoIcons.add,
-          // color: Colors.white,
-        ),
+        onPressed: () => context.push('/add-expense'),
+        child: const Icon(CupertinoIcons.add),
       ),
-      body: index == 0
-          ? MainScreen()
-          : index == 1
-          ? MyStatistics()
-          : TipsScreen(),
     );
   }
 }
