@@ -1,5 +1,7 @@
+import 'package:budget_planner/models/transaction_model.dart';
 import 'package:budget_planner/utils/user_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:budget_planner/app.dart';
@@ -22,6 +24,15 @@ Future<void> main() async {
 
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme(); // Wait before app starts
+
+  //initialize hive
+  await Hive.initFlutter();
+
+  //Register adapter
+  Hive.registerAdapter(TransactionModelAdapter());
+
+  // open box
+  await Hive.openBox<TransactionModel>('transactions');
 
   runApp(
     MultiProvider(

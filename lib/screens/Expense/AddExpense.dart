@@ -1,9 +1,13 @@
 import 'package:budget_planner/models/data/data.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:budget_planner/utils/user_utils.dart';
+import 'package:budget_planner/models/transaction_model.dart';
+import 'package:budget_planner/services/hive_transaction_service.dart';
+import 'package:uuid/uuid.dart';
 
 class AddExpense extends StatefulWidget {
   const AddExpense({super.key});
@@ -449,7 +453,80 @@ class _AddExpenseState extends State<AddExpense> {
                 width: double.infinity,
                 height: kToolbarHeight,
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    //validate fields
+
+                    final description =
+                        descriptionController.text.trim();
+                    final amountText = expenseController
+                        .text
+                        .trim();
+                    final category = selectedCategory ?? '';
+                    final type = selectedType ?? '';
+                    final date = selectDate;
+                    if (description.isEmpty ||
+                        amountText.isEmpty ||
+                        category.isEmpty ||
+                        type.isEmpty) {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'please fill all fields',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+                    final amount = double.tryParse(
+                      amountText,
+                    );
+                    if (amount == null) {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
+                        const SnackBar(
+                          content: Text("Invalid amount"),
+                        ),
+                      );
+                      return;
+                    }
+                    //create transcation model
+                    final txn = TransactionModel(
+                      id: const Uuid().v4(),
+                      category: category,
+                      description: description,
+                      amount: amount,
+                      date: date,
+                      type: type,
+                    );
+
+                    //save to hive
+                    await HiveTransactionService.addTransaction(
+                      txn,
+                    );
+
+                    //give feedback to user
+
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '$category transaction added',
+                        ),
+                      ),
+                    );
+                    //Reset fields
+                    descriptionController.clear();
+                    expenseController.clear();
+                    categoryController.clear();
+                    setState(() {
+                      selectedCategory = null;
+                      selectedType = null;
+                    });
+                  },
                   style: TextButton.styleFrom(
                     backgroundColor: Theme.of(
                       context,
@@ -636,7 +713,7 @@ class _AddExpenseState extends State<AddExpense> {
                   ),
                 const SizedBox(height: 20),
 
-                //  Save button
+                //  Save button for modal create category
                 SizedBox(
                   width: double.infinity,
                   height: kToolbarHeight,

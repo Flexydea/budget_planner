@@ -21,12 +21,18 @@ dependencies:
   firebase_auth: ^6.0.2
   # sign_in_with_apple: ^7.0.1
   google_sign_in: ^6.2.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  uuid: ^4.4.0
+  lottie: ^3.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.6
 
 flutter_icons:
   android: true
@@ -49,6 +55,7 @@ flutter:
     - assets/images/monthly.png
     - assets/images/app_icon1.png
     - assets/images/app_icon_raw.png
+    - assets/animations/empty_box.json
 
     
     

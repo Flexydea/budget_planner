@@ -1,6 +1,8 @@
+import 'package:budget_planner/screens/transactions/transaction_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:budget_planner/utils/user_utils.dart';
+import 'package:budget_planner/services/hive_transaction_service.dart';
 
 class CategoryTab extends StatefulWidget {
   const CategoryTab({super.key});
@@ -50,6 +52,15 @@ class _CategoryTabState extends State<CategoryTab> {
     );
   }
 
+  ///  Count total transactions belonging to a specific category
+  int _getTransactionCount(String categoryName) {
+    final allTxns =
+        HiveTransactionService.getTransactionsByCategory(
+          categoryName,
+        );
+    return allTxns.length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,11 +76,13 @@ class _CategoryTabState extends State<CategoryTab> {
         title: const Text(
           "Categories",
           style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
+
+      //  Handle empty state
       body: userCategories.isEmpty
           ? const Center(
               child: Text(
@@ -84,9 +97,8 @@ class _CategoryTabState extends State<CategoryTab> {
                 gridDelegate:
                     const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      mainAxisSpacing: 14,
-                      crossAxisSpacing: 14,
-                      childAspectRatio: 1.2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
                     ),
                 itemBuilder: (context, index) {
                   final cat = userCategories[index];
@@ -98,7 +110,16 @@ class _CategoryTabState extends State<CategoryTab> {
                     onLongPress: () =>
                         _showDeleteDialog(name),
                     onTap: () {
-                      // 👉 later: navigate to category detail page
+                      //  Navigate to Transaction List screen for this category
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              TransactionListScreen(
+                                categoryName: name,
+                              ),
+                        ),
+                      );
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -127,7 +148,7 @@ class _CategoryTabState extends State<CategoryTab> {
                             Stack(
                               alignment: Alignment.topRight,
                               children: [
-                                //  Icon
+                                //  Category icon circle
                                 CircleAvatar(
                                   radius: 28,
                                   backgroundColor:
@@ -139,33 +160,44 @@ class _CategoryTabState extends State<CategoryTab> {
                                   ),
                                 ),
 
-                                //  Count badge
-                                Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                          10,
+                                //  Count badge overlay
+                                Positioned(
+                                  right: 0,
+                                  top: 0,
+                                  child: Container(
+                                    padding:
+                                        const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
                                         ),
-                                  ),
-                                  child: const Text(
-                                    "0",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontWeight:
-                                          FontWeight.bold,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                            10,
+                                          ),
+                                    ),
+                                    child: Text(
+                                      _getTransactionCount(
+                                        name,
+                                      ).toString(),
+                                      style:
+                                          const TextStyle(
+                                            color: Colors
+                                                .white,
+                                            fontSize: 10,
+                                            fontWeight:
+                                                FontWeight
+                                                    .bold,
+                                          ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 10),
+
+                            //  Category name
                             Text(
                               name,
                               style: const TextStyle(
