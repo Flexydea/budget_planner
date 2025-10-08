@@ -150,13 +150,13 @@ class _CategoryTabState extends State<CategoryTab> {
                               children: [
                                 //  Category icon circle
                                 CircleAvatar(
-                                  radius: 28,
+                                  radius: 42,
                                   backgroundColor:
                                       Colors.black,
                                   child: Icon(
                                     icon,
                                     color: Colors.white,
-                                    size: 20,
+                                    size: 30,
                                   ),
                                 ),
 
@@ -185,7 +185,7 @@ class _CategoryTabState extends State<CategoryTab> {
                                           const TextStyle(
                                             color: Colors
                                                 .white,
-                                            fontSize: 10,
+                                            fontSize: 16,
                                             fontWeight:
                                                 FontWeight
                                                     .bold,
