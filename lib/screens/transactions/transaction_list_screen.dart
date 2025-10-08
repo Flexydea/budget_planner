@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:budget_planner/services/hive_transaction_service.dart';
 import 'package:budget_planner/models/transaction_model.dart';
 import 'package:budget_planner/models/data/data.dart';
+import 'package:budget_planner/utils/user_utils.dart';
 
 class TransactionListScreen extends StatefulWidget {
   final String categoryName;
@@ -20,27 +23,55 @@ class TransactionListScreen extends StatefulWidget {
 
 class _TransactionListScreenState
     extends State<TransactionListScreen> {
+  //  Local state
   List<TransactionModel> transactions = [];
+  final Map<String, IconData> categoryIcons =
+      {}; //  name -> icon (lowercased key)
 
   @override
   void initState() {
     super.initState();
-    _loadTransactions();
+    _initIconsAndData(); //  build icon cache + load txns
   }
 
-  /// ✅ Load transactions for the selected category
-  void _loadTransactions() {
+  ///  Build icon cache (defaults + user) + load transactions
+  Future<void> _initIconsAndData() async {
+    //  1) ensure we know the current user
+    await loadCurrentUser();
+
+    //  2) start with defaults from data.dart
+    categoryIcons.clear();
+    for (final item in AvailableIcons) {
+      final name = (item['name'] as String).toLowerCase();
+      final icon = item['icon'] as IconData;
+      categoryIcons[name] = icon;
+    }
+
+    //  3) merge user's custom categories (overwrites defaults if same name)
+    final userCats = await loadUserCategoriesForUser(
+      currentUserId,
+    );
+    for (final cat in userCats) {
+      final name = (cat['name'] as String).toLowerCase();
+      final icon = cat['icon'] as IconData?;
+      if (icon != null) categoryIcons[name] = icon;
+    }
+
+    //  4) load transactions for this category
     transactions =
         HiveTransactionService.getTransactionsByCategory(
           widget.categoryName,
         );
-    setState(() {});
+
+    if (mounted) setState(() {});
   }
 
-  /// ✅ Delete transaction + undo option
-  void _deleteTransaction(TransactionModel txn) async {
+  ///  Delete transaction + undo
+  Future<void> _deleteTransaction(
+    TransactionModel txn,
+  ) async {
     await HiveTransactionService.deleteTransaction(txn.id);
-    _loadTransactions();
+    await _initIconsAndData(); //  refresh list + icons
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -51,35 +82,32 @@ class _TransactionListScreenState
             await HiveTransactionService.addTransaction(
               txn,
             );
-            _loadTransactions();
+            await _initIconsAndData();
           },
         ),
       ),
     );
   }
 
-  /// ✅ Format date — show “Today” or actual date
+  ///  Format date — show “Today”, otherwise dd/MM/yy
   String _formatDate(DateTime date) {
     final now = DateTime.now();
-    final difference = now.difference(date).inDays;
+    final difference =
+        DateTime(now.year, now.month, now.day)
+            .difference(
+              DateTime(date.year, date.month, date.day),
+            )
+            .inDays;
 
     if (difference == 0) return "Today";
-    if (difference == 1) {
-      // show actual date instead of “Yesterday”
-      return DateFormat('dd/MM/yy').format(date);
-    }
+    //  per your spec: for yesterday, show actual date as well
     return DateFormat('dd/MM/yy').format(date);
   }
 
-  /// ✅ Find matching icon from your data.dart
+  ///  Get icon for category name from cache (sync)
   IconData _getCategoryIcon(String categoryName) {
-    final match = AvailableIcons.firstWhere(
-      (item) =>
-          (item['name'] as String).toLowerCase() ==
-          categoryName.toLowerCase(),
-      orElse: () => {'icon': Icons.category},
-    );
-    return match['icon'] as IconData;
+    final key = categoryName.toLowerCase().trim();
+    return categoryIcons[key] ?? Icons.category;
   }
 
   @override
@@ -100,7 +128,7 @@ class _TransactionListScreenState
         ),
       ),
 
-      /// ✅ Empty state with Lottie animation
+      //  Empty state with Lottie animation
       body: transactions.isEmpty
           ? Center(
               child: Column(
@@ -115,9 +143,7 @@ class _TransactionListScreenState
                     'No transactions yet',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -181,7 +207,7 @@ class _TransactionListScreenState
                       mainAxisAlignment:
                           MainAxisAlignment.spaceBetween,
                       children: [
-                        // ✅ Left side — icon + description
+                        //  Left side — icon + description
                         Row(
                           children: [
                             Container(
@@ -230,7 +256,7 @@ class _TransactionListScreenState
                           ],
                         ),
 
-                        // ✅ Right side — amount
+                        //  Right side — amount
                         Text(
                           "${isIncome ? '+' : '-'}£${txn.amount.toStringAsFixed(2)}",
                           style: TextStyle(
@@ -245,6 +271,22 @@ class _TransactionListScreenState
                 );
               },
             ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primary,
+        foregroundColor: Theme.of(
+          context,
+        ).colorScheme.onPrimary,
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        onPressed: () => context.push('/add-expense'),
+        child: const Icon(CupertinoIcons.add),
+      ),
     );
   }
 }
