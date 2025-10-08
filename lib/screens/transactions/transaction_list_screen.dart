@@ -61,7 +61,9 @@ class _TransactionListScreenState
     transactions =
         HiveTransactionService.getTransactionsByCategory(
           widget.categoryName,
-        );
+        )..sort(
+          (a, b) => b.date.compareTo(a.date),
+        ); // newest first
 
     if (mounted) setState(() {});
   }

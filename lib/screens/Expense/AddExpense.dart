@@ -1,6 +1,7 @@
 import 'package:budget_planner/models/data/data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -155,6 +156,7 @@ class _AddExpenseState extends State<AddExpense> {
     final category = selectedCategory ?? '';
     final type = selectedType ?? '';
 
+    // ✅ Check if required fields are filled
     if (description.isEmpty ||
         amountText.isEmpty ||
         category.isEmpty ||
@@ -163,27 +165,33 @@ class _AddExpenseState extends State<AddExpense> {
       return;
     }
 
+    // ✅ Parse and validate numeric input
     final amount = double.tryParse(amountText);
-    if (amount == null) {
+    if (amount == null || amount <= 0) {
       _showValidationModal();
       return;
     }
+
+    // ✅ Normalize amount to 2 decimals for clean data
+    final normalizedAmount = double.parse(
+      amount.toStringAsFixed(2),
+    );
 
     final txn = TransactionModel(
       id: const Uuid().v4(),
       category: category,
       description: description,
-      amount: amount,
+      amount: normalizedAmount,
       date: selectDate,
       type: type,
     );
 
     await HiveTransactionService.addTransaction(txn);
 
-    //  Show success animation
+    // ✅ Success animation
     await _showSuccessAnimation(category);
 
-    //  Reset form
+    // ✅ Reset fields
     descriptionController.clear();
     expenseController.clear();
     categoryController.clear();
@@ -232,6 +240,14 @@ class _AddExpenseState extends State<AddExpense> {
                         decimal: true,
                       ),
                   textAlign: TextAlign.center,
+
+                  //  Only allow numbers and up to 2 decimal places
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d*\.?\d{0,2}'),
+                    ),
+                  ],
+
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Theme.of(
@@ -241,7 +257,7 @@ class _AddExpenseState extends State<AddExpense> {
                       FontAwesomeIcons.sterlingSign,
                       size: 16,
                     ),
-                    hintText: 'Amount',
+                    hintText: '0.00',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
                         10,
@@ -267,9 +283,19 @@ class _AddExpenseState extends State<AddExpense> {
               //  Description field
               TextFormField(
                 controller: descriptionController,
+                maxLength: 25,
+                buildCounter:
+                    (
+                      BuildContext context, {
+                      required int currentLength,
+                      required int? maxLength,
+                      required bool isFocused,
+                    }) {
+                      // ✅ Hide the counter visually (keeps clean UI)
+                      return const SizedBox.shrink();
+                    },
                 decoration: InputDecoration(
-                  hintText:
-                      'Description (e.g. Burger, Uber Ride)',
+                  hintText: 'Description (max 25 chars)',
                   prefixIcon: const Icon(
                     Icons.description_outlined,
                     size: 18,
