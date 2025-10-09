@@ -1,3 +1,4 @@
+import 'package:budget_planner/utils/currency_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -27,11 +28,23 @@ class _TransactionListScreenState
   List<TransactionModel> transactions = [];
   final Map<String, IconData> categoryIcons =
       {}; //  name -> icon (lowercased key)
+  String _currencySymbol = '£';
 
   @override
   void initState() {
     super.initState();
+    _loadCurrencySymbol();
     _initIconsAndData(); //  build icon cache + load txns
+  }
+
+  Future<void> _loadCurrencySymbol() async {
+    await loadCurrentUser(); // ensure user ID is available
+    final code = await getUserCurrency(currentUserId);
+    final symbol = currencySymbolOf(code);
+    if (!mounted) return;
+    setState(() {
+      _currencySymbol = symbol;
+    });
   }
 
   ///  Build icon cache (defaults + user) + load transactions
@@ -53,8 +66,23 @@ class _TransactionListScreenState
     );
     for (final cat in userCats) {
       final name = (cat['name'] as String).toLowerCase();
-      final icon = cat['icon'] as IconData?;
-      if (icon != null) categoryIcons[name] = icon;
+      final iconMap = cat['icon'];
+
+      // Decode icon data safely
+      IconData? iconData;
+      if (iconMap is IconData) {
+        iconData = iconMap;
+      } else if (iconMap is Map) {
+        iconData = IconData(
+          iconMap['codePoint'] ?? 0xe14c,
+          fontFamily: iconMap['fontFamily'],
+          fontPackage: iconMap['fontPackage'],
+          matchTextDirection:
+              iconMap['matchTextDirection'] ?? false,
+        );
+      }
+
+      if (iconData != null) categoryIcons[name] = iconData;
     }
 
     //  4) load transactions for this category
@@ -260,7 +288,7 @@ class _TransactionListScreenState
 
                         //  Right side — amount
                         Text(
-                          "${isIncome ? '+' : '-'}£${txn.amount.toStringAsFixed(2)}",
+                          "${isIncome ? '+' : '-'}$_currencySymbol${txn.amount.toStringAsFixed(2)}",
                           style: TextStyle(
                             color: amountColor,
                             fontSize: 16,

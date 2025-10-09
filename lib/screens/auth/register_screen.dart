@@ -1,5 +1,6 @@
 import 'package:budget_planner/screens/auth/widgets/accept_terms_text.dart';
 import 'package:budget_planner/services/user_prefs.dart';
+import 'package:budget_planner/utils/currency_utils.dart';
 import 'package:budget_planner/utils/user_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuthException, FirebaseAuth;
@@ -125,9 +126,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        // ✅ Set this new user as current and migrate demo data
+        //  Set this new user as current and migrate demo data
         await setCurrentUser(user.uid);
         await migrateDemoCategoriesToUser(user.uid);
+        await migrateCurrencyFromDemoTo(user.uid);
       }
 
       // 5️⃣ Save display name

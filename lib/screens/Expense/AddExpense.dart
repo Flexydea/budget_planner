@@ -10,6 +10,7 @@ import 'package:budget_planner/models/transaction_model.dart';
 import 'package:budget_planner/services/hive_transaction_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:uuid/uuid.dart';
+import 'package:budget_planner/utils/currency_utils.dart';
 
 class AddExpense extends StatefulWidget {
   const AddExpense({super.key});
@@ -36,6 +37,10 @@ class _AddExpenseState extends State<AddExpense> {
   String? selectedCategory;
   List<Map<String, dynamic>> userCategories = [];
 
+  // ✅ Default values (safe fallbacks)
+  String _currencyCode = kDefaultCurrencyCode;
+  String _currencySymbol = '£';
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +48,25 @@ class _AddExpenseState extends State<AddExpense> {
       'dd/MM/yy',
     ).format(DateTime.now());
     _loadUserCategories();
+    _loadUserCurrency();
+  }
+
+  Future<void> _loadUserCurrency() async {
+    await loadCurrentUser();
+    print('🔍 Loading currency for user: $currentUserId');
+    final code = await getUserCurrency(currentUserId);
+    final symbol = currencySymbolOf(code);
+
+    if (!mounted) return;
+
+    setState(() {
+      _currencyCode = code;
+      _currencySymbol = symbol;
+    });
+
+    print(
+      '✅ Loaded currency: $_currencyCode ($_currencySymbol)',
+    );
   }
 
   ///  Load categories for the current user
@@ -50,6 +74,9 @@ class _AddExpenseState extends State<AddExpense> {
     await loadCurrentUser();
     final list = await loadUserCategoriesForUser(
       currentUserId,
+    );
+    print(
+      'Loaded categories for $currentUserId: $userCategories',
     );
     if (!mounted) return;
     setState(() => userCategories = list);
@@ -253,9 +280,16 @@ class _AddExpenseState extends State<AddExpense> {
                     fillColor: Theme.of(
                       context,
                     ).colorScheme.surface,
-                    prefixIcon: const Icon(
-                      FontAwesomeIcons.sterlingSign,
-                      size: 16,
+                    prefixIcon: Container(
+                      alignment: Alignment.center,
+                      width: 50,
+                      child: Text(
+                        _currencySymbol,
+                        style: const TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     hintText: '0.00',
                     border: OutlineInputBorder(
@@ -471,109 +505,124 @@ class _AddExpenseState extends State<AddExpense> {
       controller: categoryController,
       onTap: () async {
         if (userCategories.isNotEmpty) {
-          final selected =
-              await showModalBottomSheet<
-                Map<String, dynamic>
-              >(
-                context: context,
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.surface,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
-                ),
-                builder: (context) => Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Select Category',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+          final selected = await showModalBottomSheet<Map<String, dynamic>>(
+            context: context,
+            isScrollControlled:
+                true, // <-- important for tall content
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.surface,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+            ),
+            builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              initialChildSize:
+                  0.6, // take up 60% of the screen
+              minChildSize: 0.4,
+              maxChildSize: 0.9,
+              builder: (context, scrollController) =>
+                  SingleChildScrollView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Select Category',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics:
-                            const NeverScrollableScrollPhysics(),
-                        itemCount: userCategories.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                            ),
-                        itemBuilder: (context, index) {
-                          final cat = userCategories[index];
-                          return GestureDetector(
-                            onTap: () =>
-                                Navigator.pop(context, cat),
-                            child: Column(
-                              mainAxisSize:
-                                  MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding:
-                                      const EdgeInsets.all(
-                                        14,
-                                      ),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .background,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black
-                                            .withOpacity(
-                                              0.05,
-                                            ),
-                                        blurRadius: 4,
-                                        offset:
-                                            const Offset(
-                                              0,
-                                              2,
-                                            ),
-                                      ),
-                                    ],
+                        const SizedBox(height: 16),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics:
+                              const NeverScrollableScrollPhysics(),
+                          itemCount: userCategories.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                              ),
+                          itemBuilder: (context, index) {
+                            final cat =
+                                userCategories[index];
+                            return GestureDetector(
+                              onTap: () => Navigator.pop(
+                                context,
+                                cat,
+                              ),
+                              child: Column(
+                                mainAxisSize:
+                                    MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    padding:
+                                        const EdgeInsets.all(
+                                          14,
+                                        ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .background,
+                                      shape:
+                                          BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors
+                                              .black
+                                              .withOpacity(
+                                                0.05,
+                                              ),
+                                          blurRadius: 4,
+                                          offset:
+                                              const Offset(
+                                                0,
+                                                2,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Icon(
+                                      cat['icon'] ??
+                                          Icons.category,
+                                      size: 22,
+                                      color:
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                    ),
                                   ),
-                                  child: Icon(
-                                    cat['icon'] ??
-                                        Icons.category,
-                                    size: 22,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    cat['name'],
+                                    overflow: TextOverflow
+                                        .ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color:
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  cat['name'],
-                                  overflow:
-                                      TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
+            ),
+          );
 
           if (selected != null) {
             setState(() {
@@ -608,6 +657,151 @@ class _AddExpenseState extends State<AddExpense> {
 
   ///  Reuse your same _showAddCategoryDialog() method
   void _showAddCategoryDialog() {
-    // unchanged from your version
+    final TextEditingController _nameController =
+        TextEditingController();
+    IconData? _selectedIcon;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: const Text('Create Category'),
+          content: SingleChildScrollView(
+            // ✅ Fix overflow
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    hintText: 'Category name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: AvailableIcons.map((item) {
+                    final icon = item['icon'] as IconData;
+                    final isSelected =
+                        _selectedIcon == icon;
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedIcon = icon;
+                        });
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(
+                              milliseconds: 200,
+                            ),
+                            padding: const EdgeInsets.all(
+                              14,
+                            ),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surface, // uses app surface color
+                              border: Border.all(
+                                color: isSelected
+                                    ? Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                    : Theme.of(
+                                        context,
+                                      ).dividerColor,
+                                width: isSelected ? 2 : 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(context)
+                                      .shadowColor
+                                      .withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(
+                                    0,
+                                    2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              icon,
+                              size: 22,
+                              color: Colors.black,
+                            ),
+                          ),
+                          if (isSelected)
+                            Positioned(
+                              right: 2,
+                              top: 2,
+                              child: Container(
+                                decoration:
+                                    const BoxDecoration(
+                                      color: Colors.black,
+                                      shape:
+                                          BoxShape.circle,
+                                    ),
+                                padding:
+                                    const EdgeInsets.all(3),
+                                child: const Icon(
+                                  Icons.check,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final name = _nameController.text.trim();
+                if (name.isEmpty || _selectedIcon == null)
+                  return;
+
+                await loadCurrentUser();
+
+                final existing =
+                    await loadUserCategoriesForUser(
+                      currentUserId,
+                    );
+                existing.add({
+                  'name': name,
+                  'icon': _selectedIcon,
+                });
+                await saveUserCategoriesForUser(
+                  currentUserId,
+                  existing,
+                );
+
+                Navigator.pop(context);
+                _loadUserCategories();
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

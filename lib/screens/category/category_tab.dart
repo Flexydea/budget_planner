@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:budget_planner/utils/user_utils.dart';
 import 'package:budget_planner/services/hive_transaction_service.dart';
+import 'package:lottie/lottie.dart';
 
 class CategoryTab extends StatefulWidget {
   const CategoryTab({super.key});
@@ -63,6 +64,8 @@ class _CategoryTabState extends State<CategoryTab> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       backgroundColor: Theme.of(
         context,
@@ -84,10 +87,28 @@ class _CategoryTabState extends State<CategoryTab> {
 
       //  Handle empty state
       body: userCategories.isEmpty
-          ? const Center(
-              child: Text(
-                "No categories yet",
-                style: TextStyle(color: Colors.grey),
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Lottie.asset(
+                    'assets/animations/empty_box.json',
+                    width: 300,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No category yet',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Add one from the + button',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
               ),
             )
           : Padding(

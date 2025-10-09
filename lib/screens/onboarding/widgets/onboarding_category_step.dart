@@ -43,7 +43,7 @@ class OnboardingCategoryStep extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // ✅ Category selection grid
+          //  Category selection grid
           Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -111,7 +111,7 @@ class OnboardingCategoryStep extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // ✅ Next button
+          //  Next button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -121,7 +121,7 @@ class OnboardingCategoryStep extends StatelessWidget {
                       final userId =
                           currentUserId ?? 'demo_user';
                       await saveUserCategoriesForUser(
-                        userId,
+                        'demo_user',
                         selectedCategories,
                       );
                       onNext(); // continue to the name/date step

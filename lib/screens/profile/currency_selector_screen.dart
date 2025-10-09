@@ -1,5 +1,7 @@
 import 'package:budget_planner/models/data/data.dart';
 import 'package:flutter/material.dart';
+import 'package:budget_planner/utils/currency_utils.dart';
+import 'package:budget_planner/utils/user_utils.dart';
 
 class CurrencySelectorScreen extends StatefulWidget {
   const CurrencySelectorScreen({super.key});
@@ -11,7 +13,20 @@ class CurrencySelectorScreen extends StatefulWidget {
 
 class _CurrencySelectorScreenState
     extends State<CurrencySelectorScreen> {
-  String _selectedCurrency = 'GBP';
+  String? _selectedCurrency;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserCurrency();
+  }
+
+  Future<void> _loadUserCurrency() async {
+    await loadCurrentUser();
+    final code = await getUserCurrency(currentUserId);
+    if (!mounted) return;
+    setState(() => _selectedCurrency = code);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +67,16 @@ class _CurrencySelectorScreenState
               trailing: isSelected
                   ? const Icon(Icons.check_circle)
                   : null,
-              onTap: () {
-                setState(() {
-                  _selectedCurrency = currency['code']!;
-                });
+              onTap: () async {
+                final code = currency['code']!;
+                setState(() => _selectedCurrency = code);
 
-                // Return selected currency back
-                // Navigator.pop(context, _selectedCurrency);
+                // Save selected currency for this user
+                await loadCurrentUser();
+                await setUserCurrency(currentUserId, code);
+
+                // Return to previous screen and pass the code if needed
+                Navigator.pop(context, code);
               },
             ),
           );

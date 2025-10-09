@@ -2,6 +2,7 @@ import 'package:budget_planner/providers/auth_provider.dart'
     as custom_auth;
 import 'package:budget_planner/screens/auth/widgets/close_account_dialog.dart';
 import 'package:budget_planner/services/user_prefs.dart';
+import 'package:budget_planner/utils/currency_utils.dart';
 import 'package:budget_planner/utils/user_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,11 +22,26 @@ class ProfileSettingsScreen extends StatefulWidget {
 class _ProfileSettingsScreenState
     extends State<ProfileSettingsScreen> {
   String? _userName;
+  String? _selectedCurrency;
+  String? _currencySymbol;
 
   @override
   void initState() {
     super.initState();
     _loadName();
+    _loadUserCurrency();
+  }
+
+  Future<void> _loadUserCurrency() async {
+    await loadCurrentUser();
+    print('Loading currency for user: $currentUserId');
+    final code = await getUserCurrency(currentUserId);
+    final symbol = currencySymbolOf(code);
+    if (!mounted) return;
+    setState(() {
+      _selectedCurrency = code;
+      _currencySymbol = symbol;
+    });
   }
 
   Future<void> _loadName() async {
@@ -208,8 +224,22 @@ class _ProfileSettingsScreenState
             _buildGroupedTileCardPreference(
               icon1: Icons.monetization_on_outlined,
               title1: 'Currency',
-              onTap1: () =>
-                  context.push('/settings/currency'),
+              onTap1: () async {
+                // Open currency selector
+                final newCode = await context.push(
+                  '/settings/currency',
+                );
+
+                // If a new currency is returned, refresh display
+                if (newCode is String && mounted) {
+                  setState(() {
+                    _selectedCurrency = newCode;
+                    _currencySymbol = currencySymbolOf(
+                      newCode,
+                    );
+                  });
+                }
+              },
               icon2: Icons.notifications_active_outlined,
               title2: 'Notification',
               notificationEnabled: _notificationEnabled,
@@ -387,17 +417,24 @@ class _ProfileSettingsScreenState
         children: [
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: Icon(icon1),
-            title: Text(title1),
-            onTap: onTap1,
-          ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
             leading: Icon(icon2),
             title: Text(title2),
             trailing: Switch(
               value: notificationEnabled,
               onChanged: onNotificationToggle,
+            ),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(icon1),
+            title: Text(title1),
+            onTap: onTap1,
+            trailing: Text(
+              _currencySymbol ?? '£',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+              ),
             ),
           ),
         ],

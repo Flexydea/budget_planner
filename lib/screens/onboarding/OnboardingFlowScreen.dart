@@ -1,3 +1,6 @@
+import 'package:budget_planner/screens/onboarding/widgets/onboarding_currency_step.dart';
+import 'package:budget_planner/utils/currency_utils.dart';
+import 'package:budget_planner/utils/user_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'widgets/onboarding_category_step.dart';
@@ -18,19 +21,38 @@ class _OnboardingFlowScreenState
   final PageController _pageController = PageController();
   int _currentPage = 0;
   final int _totalSteps = 3;
+  String? _selectedCurrency;
 
   List<Map<String, dynamic>> _selectedCategories = [];
   final TextEditingController _nameController =
       TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
-  void _nextPage() {
+  Future<void> _nextPage() async {
     if (_currentPage < _totalSteps - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
+      // ✅ Save currency before going to register
+      await loadCurrentUser();
+
+      if (_selectedCurrency != null &&
+          _selectedCurrency!.isNotEmpty) {
+        // Save to demo_user first (so it can be migrated after register)
+        await setUserCurrency(
+          'demo_user',
+          _selectedCurrency!,
+        );
+        print(
+          '💾 Saved currency for demo_user: $_selectedCurrency',
+        );
+      } else {
+        print('⚠️ No currency selected before register.');
+      }
+
+      // Now continue to registration
       context.go(
         '/register',
         extra: _nameController.text.trim(),
@@ -62,7 +84,7 @@ class _OnboardingFlowScreenState
         backgroundColor: Colors.white,
         body: Column(
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 80),
             LinearProgressIndicator(
               value: (_currentPage + 1) / _totalSteps,
               backgroundColor: Colors.grey[300],
@@ -86,10 +108,10 @@ class _OnboardingFlowScreenState
                     nameController: _nameController,
                     onNext: _nextPage,
                   ),
-                  OnboardingDobStep(
-                    selectedDate: _selectedDate,
-                    onDateChanged: (date) => setState(
-                      () => _selectedDate = date,
+                  OnboardingCurrencyStep(
+                    selectedCurrency: _selectedCurrency,
+                    onCurrencyChanged: (v) => setState(
+                      () => _selectedCurrency = v,
                     ),
                     onFinish: _nextPage,
                   ),

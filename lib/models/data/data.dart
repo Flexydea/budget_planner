@@ -5,7 +5,10 @@ final List<Map<String, dynamic>> currencies = [
   {'code': 'USD', 'symbol': '\$'},
   {'code': 'EUR', 'symbol': '€'},
   {'code': 'NGN', 'symbol': '₦'},
+  {'code': 'GHS', 'symbol': '₵'},
+  {'code': 'ZAR', 'symbol': 'R'},
   {'code': 'CAD', 'symbol': 'C\$'},
+  {'code': 'AUD', 'symbol': 'A\$'},
   {'code': 'JPY', 'symbol': '¥'},
 ];
 
