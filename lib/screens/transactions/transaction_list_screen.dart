@@ -136,8 +136,34 @@ class _TransactionListScreenState
 
   ///  Get icon for category name from cache (sync)
   IconData _getCategoryIcon(String categoryName) {
-    final key = categoryName.toLowerCase().trim();
-    return categoryIcons[key] ?? Icons.category;
+    final key = categoryName.trim().toLowerCase();
+
+    // Try exact match first
+    if (categoryIcons.containsKey(key)) {
+      return categoryIcons[key]!;
+    }
+
+    // Try fuzzy match: ignore spaces & special chars
+    final normalized = key.replaceAll(
+      RegExp(r'[^a-z0-9]'),
+      '',
+    );
+    for (final entry in categoryIcons.entries) {
+      final eKey = entry.key.replaceAll(
+        RegExp(r'[^a-z0-9]'),
+        '',
+      );
+      if (eKey == normalized) return entry.value;
+    }
+
+    // Final fallback: look directly in AvailableIcons
+    final match = AvailableIcons.firstWhere(
+      (m) =>
+          (m['name'] as String).trim().toLowerCase() == key,
+      orElse: () => {'icon': Icons.category},
+    );
+
+    return match['icon'] as IconData;
   }
 
   @override

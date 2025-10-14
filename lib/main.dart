@@ -15,6 +15,9 @@ Future<void> main() async {
 
   await loadCurrentUser();
 
+  // Auto-fix any icon encoding issues
+  await normalizeUserCategories(currentUserId);
+
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove('user_categories');
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:budget_planner/models/data/data.dart';
+import 'package:budget_planner/services/hive_transaction_service.dart';
 
 ///  Prefix for per-user category storage
 const String _kUserCategoriesKeyPrefix = 'user_categories_';
@@ -19,17 +20,35 @@ Map<String, dynamic>? _encodeIconData(IconData? icon) {
   };
 }
 
-IconData? _decodeIconData(Map<String, dynamic>? map) {
+IconData? _decodeIconData(dynamic map) {
+  // If null, nothing to decode
   if (map == null) return null;
-  final cp = map['codePoint'];
-  if (cp is! int) return null;
 
-  return IconData(
-    cp,
-    fontFamily: map['fontFamily'] as String?,
-    fontPackage: map['fontPackage'] as String?,
-    matchTextDirection: map['matchTextDirection'] ?? false,
-  );
+  // Case 1: already IconData-like map
+  if (map is Map<String, dynamic>) {
+    final cp = map['codePoint'];
+    if (cp is int) {
+      return IconData(
+        cp,
+        fontFamily: map['fontFamily'] as String?,
+        fontPackage: map['fontPackage'] as String?,
+        matchTextDirection:
+            map['matchTextDirection'] ?? false,
+      );
+    }
+  }
+
+  // Case 2: previously saved as raw integer (legacy onboarding)
+  if (map is int) {
+    // try matching with AvailableIcons to recover
+    final match = AvailableIcons.firstWhere(
+      (c) => (c['icon'] as IconData).codePoint == map,
+      orElse: () => {'icon': Icons.category},
+    );
+    return match['icon'] as IconData;
+  }
+
+  return Icons.category;
 }
 
 ///  Save user categories (per specific user)
@@ -53,6 +72,27 @@ Future<void> saveUserCategoriesForUser(
     '$_kUserCategoriesKeyPrefix$userId',
     jsonEncode(encoded),
   );
+}
+
+Future<void> clearDemoTransactions() async {
+  final txns = HiveTransactionService.getAllTransactions();
+  if (txns.isNotEmpty) {
+    for (final txn in txns) {
+      await HiveTransactionService.deleteTransaction(
+        txn.id,
+      );
+    }
+    debugPrint(
+      'Cleared demo transactions before creating new user.',
+    );
+  }
+}
+
+Future<void> normalizeUserCategories(String userId) async {
+  final cats = await loadUserCategoriesForUser(userId);
+  if (cats.isNotEmpty) {
+    await saveUserCategoriesForUser(userId, cats);
+  }
 }
 
 ///  Load categories for a given user
