@@ -26,6 +26,7 @@ class _TransactionListScreenState
     extends State<TransactionListScreen> {
   //  Local state
   List<TransactionModel> transactions = [];
+  List<Map<String, dynamic>>? userCategoriesCache;
   final Map<String, IconData> categoryIcons =
       {}; //  name -> icon (lowercased key)
   String _currencySymbol = '£';
@@ -49,51 +50,67 @@ class _TransactionListScreenState
 
   ///  Build icon cache (defaults + user) + load transactions
   Future<void> _initIconsAndData() async {
-    //  1) ensure we know the current user
     await loadCurrentUser();
 
-    //  2) start with defaults from data.dart
+    // 1) Start with defaults
     categoryIcons.clear();
     for (final item in AvailableIcons) {
-      final name = (item['name'] as String).toLowerCase();
+      final name = (item['name'] as String)
+          .trim()
+          .toLowerCase();
       final icon = item['icon'] as IconData;
       categoryIcons[name] = icon;
     }
 
-    //  3) merge user's custom categories (overwrites defaults if same name)
+    // 2) Merge user's categories by NAME → canonical icon
     final userCats = await loadUserCategoriesForUser(
       currentUserId,
     );
     for (final cat in userCats) {
-      final name = (cat['name'] as String).toLowerCase();
-      final iconMap = cat['icon'];
+      final name = ((cat['name'] ?? '') as String)
+          .trim()
+          .toLowerCase();
+      if (name.isEmpty) continue;
 
-      // Decode icon data safely
-      IconData? iconData;
-      if (iconMap is IconData) {
-        iconData = iconMap;
-      } else if (iconMap is Map) {
-        iconData = IconData(
-          iconMap['codePoint'] ?? 0xe14c,
-          fontFamily: iconMap['fontFamily'],
-          fontPackage: iconMap['fontPackage'],
-          matchTextDirection:
-              iconMap['matchTextDirection'] ?? false,
-        );
-      }
+      // Find the canonical icon from AvailableIcons by name
+      final match = AvailableIcons.firstWhere(
+        (m) =>
+            ((m['name'] as String).trim().toLowerCase()) ==
+            name,
+        orElse: () => {'icon': Icons.category},
+      );
+      final iconData = match['icon'] as IconData;
 
-      if (iconData != null) categoryIcons[name] = iconData;
+      // Overwrite (or add) ensuring same icon used everywhere
+      categoryIcons[name] = iconData;
     }
 
-    //  4) load transactions for this category
+    // 3) Load txns for this category
     transactions =
         HiveTransactionService.getTransactionsByCategory(
           widget.categoryName,
-        )..sort(
-          (a, b) => b.date.compareTo(a.date),
-        ); // newest first
+        )..sort((a, b) => b.date.compareTo(a.date));
 
     if (mounted) setState(() {});
+  }
+
+  ///  Get icon for category name (smart + onboarding compatible)
+  IconData _getCategoryIcon(String categoryName) {
+    final key = categoryName.trim().toLowerCase();
+    // direct match
+    final direct = categoryIcons[key];
+    if (direct != null) return direct;
+
+    // fuzzy (spaces/punct removed) as a last resort
+    final simplified = key.replaceAll(
+      RegExp(r'[^a-z0-9]'),
+      '',
+    );
+    for (final e in categoryIcons.entries) {
+      final k = e.key.replaceAll(RegExp(r'[^a-z0-9]'), '');
+      if (k == simplified) return e.value;
+    }
+    return Icons.category;
   }
 
   ///  Delete transaction + undo
@@ -132,38 +149,6 @@ class _TransactionListScreenState
     if (difference == 0) return "Today";
     //  per your spec: for yesterday, show actual date as well
     return DateFormat('dd/MM/yy').format(date);
-  }
-
-  ///  Get icon for category name from cache (sync)
-  IconData _getCategoryIcon(String categoryName) {
-    final key = categoryName.trim().toLowerCase();
-
-    // Try exact match first
-    if (categoryIcons.containsKey(key)) {
-      return categoryIcons[key]!;
-    }
-
-    // Try fuzzy match: ignore spaces & special chars
-    final normalized = key.replaceAll(
-      RegExp(r'[^a-z0-9]'),
-      '',
-    );
-    for (final entry in categoryIcons.entries) {
-      final eKey = entry.key.replaceAll(
-        RegExp(r'[^a-z0-9]'),
-        '',
-      );
-      if (eKey == normalized) return entry.value;
-    }
-
-    // Final fallback: look directly in AvailableIcons
-    final match = AvailableIcons.firstWhere(
-      (m) =>
-          (m['name'] as String).trim().toLowerCase() == key,
-      orElse: () => {'icon': Icons.category},
-    );
-
-    return match['icon'] as IconData;
   }
 
   @override
