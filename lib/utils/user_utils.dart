@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:budget_planner/models/data/data.dart';
 import 'package:budget_planner/services/hive_transaction_service.dart';
+import 'package:budget_planner/models/transaction_model.dart';
 
 ///  Prefix for per-user category storage
 const String _kUserCategoriesKeyPrefix = 'user_categories_';
@@ -188,4 +189,41 @@ Future<void> migrateDemoCategoriesToUser(
     '${_kUserCategoriesKeyPrefix}demo_user',
   );
   // debugPrint(' Migrated onboarding categories to $userId');
+}
+
+Future<void> deleteUserCategory(String categoryName) async {
+  await loadCurrentUser();
+  final list = await loadUserCategoriesForUser(
+    currentUserId,
+  );
+
+  // Remove from local category list
+  final updated = list
+      .where(
+        (c) =>
+            c['name'].toLowerCase() !=
+            categoryName.toLowerCase(),
+      )
+      .toList();
+
+  await saveUserCategoriesForUser(currentUserId, updated);
+
+  // 🧾 Remove all transactions tied to that category
+  final allTxns =
+      HiveTransactionService.getAllTransactions();
+  final remaining = allTxns
+      .where(
+        (t) =>
+            t.category.toLowerCase() !=
+            categoryName.toLowerCase(),
+      )
+      .toList();
+
+  await HiveTransactionService.replaceAllTransactions(
+    remaining,
+  );
+
+  print(
+    '🧾 Deleted category "$categoryName" and related transactions removed.',
+  );
 }

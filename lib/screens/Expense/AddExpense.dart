@@ -429,15 +429,7 @@ class _AddExpenseState extends State<AddExpense> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                ListTile(
-                  leading: const Icon(
-                    FontAwesomeIcons.arrowUp,
-                    color: Colors.green,
-                  ),
-                  title: const Text('Income'),
-                  onTap: () =>
-                      Navigator.pop(context, 'Income'),
-                ),
+
                 ListTile(
                   leading: const Icon(
                     FontAwesomeIcons.arrowDown,
@@ -446,6 +438,15 @@ class _AddExpenseState extends State<AddExpense> {
                   title: const Text('Expense'),
                   onTap: () =>
                       Navigator.pop(context, 'Expense'),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    FontAwesomeIcons.arrowUp,
+                    color: Colors.green,
+                  ),
+                  title: const Text('Income'),
+                  onTap: () =>
+                      Navigator.pop(context, 'Income'),
                 ),
               ],
             ),

@@ -35,17 +35,13 @@ class _CategoryTabState extends State<CategoryTab> {
   ///  Delete category by name
   Future<void> _deleteCategory(String name) async {
     await loadCurrentUser();
-    final list = await loadUserCategoriesForUser(
-      currentUserId,
-    );
 
-    list.removeWhere(
-      (c) =>
-          (c['name'] as String).toLowerCase() ==
-          name.toLowerCase(),
-    );
+    // 🧹 Delete from user preferences and related transactions
+    await deleteUserCategory(
+      name,
+    ); // uses the cleanup logic in user_utils.dart
 
-    await saveUserCategoriesForUser(currentUserId, list);
+    // Reload category list (to remove from UI)
     await _loadUserCategories();
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -255,6 +251,7 @@ class _CategoryTabState extends State<CategoryTab> {
             onPressed: () async {
               Navigator.pop(ctx);
               await _deleteCategory(name);
+              setState(() {}); // refresh CategoryTab itself
             },
             child: const Text(
               "Delete",

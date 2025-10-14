@@ -40,4 +40,24 @@ class HiveTransactionService {
   static Future<void> clearAll() async {
     await _box.clear();
   }
+
+  // Replace all stored transactions (used after deleting a category)
+  static Future<void> saveAllTransactions(
+    List<TransactionModel> txns,
+  ) async {
+    await _box.clear(); // remove all old transactions
+    for (final t in txns) {
+      await _box.put(t.id, t);
+    }
+  }
+
+  static Future<void> replaceAllTransactions(
+    List<TransactionModel> txns,
+  ) async {
+    final box = Hive.box<TransactionModel>('transactions');
+    await box.clear();
+    for (final t in txns) {
+      await box.put(t.id, t);
+    }
+  }
 }

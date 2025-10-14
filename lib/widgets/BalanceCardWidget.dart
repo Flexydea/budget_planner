@@ -2,7 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class BalanceCard extends StatelessWidget {
-  const BalanceCard({super.key});
+  final double totalBalance;
+  final double totalIncome;
+  final double totalExpense;
+  final String currencySymbol;
+
+  const BalanceCard({
+    super.key,
+    required this.totalBalance,
+    required this.totalIncome,
+    required this.totalExpense,
+    required this.currencySymbol,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,23 +23,22 @@ class BalanceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color:
             Theme.of(context).brightness == Brightness.light
-            ? Colors
-                  .black // card in light mode
-            : Colors.grey[900], // card in dark mode
+            ? Colors.black
+            : Colors.grey[900],
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             spreadRadius: 1,
             blurRadius: 6,
             color: Colors.black.withOpacity(0.1),
-            offset: Offset(2, 3),
+            offset: const Offset(2, 3),
           ),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
+          const Text(
             'Total Balance',
             style: TextStyle(
               color: Colors.white70,
@@ -36,10 +46,10 @@ class BalanceCard extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Text(
-            '£ 4,500',
-            style: TextStyle(
+            '$currencySymbol ${totalBalance.toStringAsFixed(2)}',
+            style: const TextStyle(
               color: Colors.white70,
               fontWeight: FontWeight.bold,
               fontSize: 40,
@@ -54,16 +64,17 @@ class BalanceCard extends StatelessWidget {
               mainAxisAlignment:
                   MainAxisAlignment.spaceBetween,
               children: [
+                // Income
                 Row(
                   children: [
                     Container(
                       width: 25,
                       height: 25,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Colors.white70,
                         shape: BoxShape.circle,
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Icon(
                           CupertinoIcons.arrow_up,
                           size: 16,
@@ -72,11 +83,11 @@ class BalanceCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Column(
+                    Column(
                       crossAxisAlignment:
                           CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Income',
                           style: TextStyle(
                             color: Colors.white70,
@@ -85,8 +96,8 @@ class BalanceCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '£ 2,500',
-                          style: TextStyle(
+                          '$currencySymbol ${totalIncome.toStringAsFixed(2)}',
+                          style: const TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
@@ -96,16 +107,18 @@ class BalanceCard extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                // Expenses
                 Row(
                   children: [
                     Container(
                       width: 25,
                       height: 25,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Colors.white70,
                         shape: BoxShape.circle,
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Icon(
                           CupertinoIcons.arrow_down,
                           size: 16,
@@ -114,11 +127,11 @@ class BalanceCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Column(
+                    Column(
                       crossAxisAlignment:
                           CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Expenses',
                           style: TextStyle(
                             color: Colors.white70,
@@ -127,8 +140,8 @@ class BalanceCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '£ 2,500',
-                          style: TextStyle(
+                          '$currencySymbol ${totalExpense.toStringAsFixed(2)}',
+                          style: const TextStyle(
                             color: Colors.red,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,

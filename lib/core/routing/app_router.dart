@@ -23,8 +23,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/',
       // builder: (context, state) => const HomeScreen(),
-      builder: (context, state) =>
-          const OnboardingFlowScreen(),
+      builder: (context, state) => const HomeScreen(),
       // builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(
