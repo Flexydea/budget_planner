@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class BalanceCard extends StatelessWidget {
   final double totalBalance;
@@ -14,6 +15,35 @@ class BalanceCard extends StatelessWidget {
     required this.totalExpense,
     required this.currencySymbol,
   });
+  String formatAmount(double amount) {
+    // If 1 million or more → compact display
+    if (amount >= 1000000) {
+      // Divide and format to 1 decimal (e.g. 2.5M)
+      final compactValue = (amount / 1000000)
+          .toStringAsFixed(1);
+      // Remove trailing .0 for clean look (e.g. 2M instead of 2.0M)
+      return '${compactValue.endsWith('.0') ? compactValue.replaceAll('.0', '') : compactValue}M';
+    }
+
+    // Otherwise → show normal amount with commas and hide .00
+    final formatted = NumberFormat(
+      '#,##0.00',
+      'en_GB',
+    ).format(amount);
+    return formatted.endsWith('.00')
+        ? formatted.replaceAll('.00', '')
+        : formatted;
+  }
+
+  // String formatCompact(double amount) {
+  //   if (amount >= 1000000) {
+  //     return '${(amount / 1000000).toStringAsFixed(1)}M';
+  //   } else if (amount >= 1000) {
+  //     return '${(amount / 1000).toStringAsFixed(1)}K';
+  //   } else {
+  //     return formatAmount(amount);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +78,7 @@ class BalanceCard extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            '$currencySymbol ${totalBalance.toStringAsFixed(2)}',
+            '$currencySymbol ${formatAmount(totalBalance)}',
             style: const TextStyle(
               color: Colors.white70,
               fontWeight: FontWeight.bold,
@@ -96,7 +126,7 @@ class BalanceCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '$currencySymbol ${totalIncome.toStringAsFixed(2)}',
+                          '$currencySymbol ${formatAmount(totalIncome)}',
                           style: const TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.w600,
@@ -140,7 +170,7 @@ class BalanceCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '$currencySymbol ${totalExpense.toStringAsFixed(2)}',
+                          '$currencySymbol ${formatAmount(totalExpense)}',
                           style: const TextStyle(
                             color: Colors.red,
                             fontWeight: FontWeight.w600,

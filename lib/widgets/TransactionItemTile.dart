@@ -6,6 +6,7 @@ import 'package:budget_planner/services/hive_transaction_service.dart';
 import 'package:budget_planner/models/data/data.dart';
 import 'package:budget_planner/utils/user_utils.dart';
 import 'package:budget_planner/utils/currency_utils.dart';
+import 'package:intl/intl.dart';
 
 class MyListviewTile extends StatefulWidget {
   const MyListviewTile({super.key});
@@ -19,6 +20,26 @@ class _MyListviewTileState extends State<MyListviewTile> {
   List<TransactionModel> _transactions = [];
   final Map<String, IconData> _categoryIcons = {};
   String _currencySymbol = '£';
+
+  String formatAmount(double amount) {
+    // If 1 million or more → compact display
+    if (amount >= 1000000) {
+      // Divide and format to 1 decimal (e.g. 2.5M)
+      final compactValue = (amount / 1000000)
+          .toStringAsFixed(1);
+      // Remove trailing .0 for clean look (e.g. 2M instead of 2.0M)
+      return '${compactValue.endsWith('.0') ? compactValue.replaceAll('.0', '') : compactValue}M';
+    }
+
+    // Otherwise → show normal amount with commas and hide .00
+    final formatted = NumberFormat(
+      '#,##0.00',
+      'en_GB',
+    ).format(amount);
+    return formatted.endsWith('.00')
+        ? formatted.replaceAll('.00', '')
+        : formatted;
+  }
 
   @override
   void initState() {
@@ -161,7 +182,7 @@ class _MyListviewTileState extends State<MyListviewTile> {
                           CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '$_currencySymbol${txn.amount.toStringAsFixed(2)}',
+                          '$_currencySymbol${formatAmount(txn.amount)}',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
