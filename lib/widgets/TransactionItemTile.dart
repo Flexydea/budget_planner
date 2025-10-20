@@ -110,9 +110,9 @@ class _MyListviewTileState extends State<MyListviewTile> {
 
       if (decoded != null && name.isNotEmpty) {
         _categoryIcons[name] = decoded;
-        debugPrint(
-          ' Loaded icon for $name (${decoded.codePoint})',
-        );
+        // debugPrint(
+        //   ' Loaded icon for $name (${decoded.codePoint})',
+        // );
       }
     }
 

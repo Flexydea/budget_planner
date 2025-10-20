@@ -1,15 +1,17 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:budget_planner/models/transaction_model.dart';
+import 'package:budget_planner/services/hive_transaction_service.dart';
+import 'package:intl/intl.dart';
+import 'package:budget_planner/utils/user_utils.dart';
 
 class MyChart extends StatefulWidget {
-  final double totalAmount;
   final String selectedMode;
   final String selectedView;
   final DateTimeRange? selectedRange;
 
   const MyChart({
     super.key,
-    this.totalAmount = 3500.0,
     required this.selectedMode,
     required this.selectedView,
     this.selectedRange,
@@ -21,19 +23,53 @@ class MyChart extends StatefulWidget {
 
 class _MyChartState extends State<MyChart> {
   int touchedIndex = -1;
+  double totalAmount = 0.0;
+  List<TransactionModel> _transactions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTransactions();
+  }
+
+  Future<void> _loadTransactions() async {
+    await loadCurrentUser();
+    final allTxns =
+        HiveTransactionService.getAllTransactions();
+
+    final start =
+        widget.selectedRange?.start ?? DateTime(2020);
+    final end = widget.selectedRange?.end ?? DateTime.now();
+
+    final filtered = allTxns.where((txn) {
+      final inRange =
+          txn.date.isAfter(start) &&
+          txn.date.isBefore(
+            end.add(const Duration(days: 1)),
+          );
+      return txn.type == widget.selectedMode && inRange;
+    }).toList();
+
+    final sum = filtered.fold<double>(
+      0.0,
+      (previous, txn) => previous + txn.amount,
+    );
+
+    setState(() {
+      _transactions = filtered;
+      totalAmount = sum;
+    });
+  }
 
   String? get subtitle {
     final range = widget.selectedRange;
     if (range == null) return null;
-
     final formatter = (DateTime date) =>
         '${_monthName(date.month)} ${date.day}, ${date.year}';
-
     if (range.start.month == range.end.month &&
         range.start.year == range.end.year) {
       return '${_monthName(range.start.month)} ${range.start.year}';
     }
-
     return '${formatter(range.start)} - ${formatter(range.end)}';
   }
 
@@ -56,38 +92,59 @@ class _MyChartState extends State<MyChart> {
     return months[month];
   }
 
-  List<String> _generateMonthLabelsFromRange() {
-    final range = widget.selectedRange;
-    if (range == null) {
-      return [
-        'JAN',
-        'FEB',
-        'MAR',
-        'APR',
-        'MAY',
-        'JUN',
-        'JUL',
+  /// 🔹 Group transactions dynamically based on view (Daily / Weekly / Monthly)
+  List<double> _generateData() {
+    if (_transactions.isEmpty) return [];
+
+    if (widget.selectedView == 'Daily') {
+      final Map<String, double> grouped = {};
+      for (final txn in _transactions) {
+        final day = DateFormat('EEE').format(txn.date);
+        grouped[day] = (grouped[day] ?? 0) + txn.amount;
+      }
+      final weekDays = [
+        'Mon',
+        'Tue',
+        'Wed',
+        'Thu',
+        'Fri',
+        'Sat',
+        'Sun',
       ];
+      return weekDays
+          .map((d) => (grouped[d] ?? 0) / 1000)
+          .toList();
+    } else if (widget.selectedView == 'Weekly') {
+      final Map<int, double> grouped = {};
+      for (final txn in _transactions) {
+        final weekNum = int.parse(
+          DateFormat('w').format(txn.date),
+        ); // ISO week number
+        grouped[weekNum] =
+            (grouped[weekNum] ?? 0) + txn.amount;
+      }
+      final weeks = grouped.keys.toList()..sort();
+      return weeks
+          .map((w) => (grouped[w]! / 1000))
+          .toList();
+    } else {
+      // Monthly
+      final Map<String, double> grouped = {};
+      for (final txn in _transactions) {
+        final month = DateFormat('MMM').format(txn.date);
+        grouped[month] = (grouped[month] ?? 0) + txn.amount;
+      }
+      final months = grouped.keys.toList()..sort();
+      return months
+          .map((m) => (grouped[m]! / 1000))
+          .toList();
     }
-
-    final months = <String>[];
-    DateTime current = DateTime(
-      range.start.year,
-      range.start.month,
-    );
-
-    while (current.isBefore(range.end) ||
-        (current.month == range.end.month &&
-            current.year == range.end.year)) {
-      months.add(_monthName(current.month).toUpperCase());
-      current = DateTime(current.year, current.month + 1);
-    }
-
-    return months;
   }
 
   @override
   Widget build(BuildContext context) {
+    final data = _generateData();
+
     return Column(
       children: [
         if (subtitle != null)
@@ -102,8 +159,8 @@ class _MyChartState extends State<MyChart> {
         const SizedBox(height: 5),
         Text(
           widget.selectedMode == 'Income'
-              ? '£${widget.totalAmount.toStringAsFixed(2)}'
-              : '-£${widget.totalAmount.toStringAsFixed(2)}',
+              ? '£${totalAmount.toStringAsFixed(2)}'
+              : '-£${totalAmount.toStringAsFixed(2)}',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -113,14 +170,13 @@ class _MyChartState extends State<MyChart> {
           ),
         ),
         const SizedBox(height: 10),
-        Expanded(child: BarChart(mainBarData())),
+        Expanded(child: BarChart(mainBarData(data))),
       ],
     );
   }
 
   BarChartGroupData makeGroupData(int x, double y) {
     bool isTouched = x == touchedIndex;
-
     return BarChartGroupData(
       x: x,
       barRods: [
@@ -151,38 +207,12 @@ class _MyChartState extends State<MyChart> {
     );
   }
 
-  List<BarChartGroupData> showingBarGroups() {
-    List<double> data = [];
-    int count = 7;
+  BarChartData mainBarData(List<double> data) {
+    final barGroups = List.generate(
+      data.length,
+      (index) => makeGroupData(index, data[index]),
+    );
 
-    if (widget.selectedView == 'Daily') {
-      data = widget.selectedMode == 'Income'
-          ? [2.0, 2.5, 1.8, 2.2, 1.9, 2.3, 2.0]
-          : [1.2, 1.5, 1.3, 1.6, 1.8, 1.1, 1.7];
-    } else if (widget.selectedView == 'Weekly') {
-      data = widget.selectedMode == 'Income'
-          ? [3.5, 4.0, 3.8, 4.2, 3.6, 3.9, 4.1]
-          : [2.5, 3.0, 2.8, 3.1, 2.9, 2.7, 3.2];
-    } else if (widget.selectedView == 'Monthly') {
-      final monthLabels = _generateMonthLabelsFromRange();
-      count = monthLabels.length.clamp(0, 7);
-      data = List.generate(
-        count,
-        (i) => widget.selectedMode == 'Income'
-            ? 7.0 + i.toDouble()
-            : 2.0 + i.toDouble(),
-      );
-    }
-
-    return List.generate(data.length, (index) {
-      return makeGroupData(index, data[index]);
-    });
-  }
-
-  BarChartData mainBarData() {
-    final barGroups = showingBarGroups();
-
-    // Compute maxY dynamically
     double maxY = 5;
     if (barGroups.isNotEmpty) {
       final highest = barGroups
@@ -273,7 +303,21 @@ class _MyChartState extends State<MyChart> {
       'W6',
       'W7',
     ];
-    final monthLabels = _generateMonthLabelsFromRange();
+
+    final monthLabels = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ];
 
     List<String> labels;
     if (widget.selectedView == 'Weekly') {

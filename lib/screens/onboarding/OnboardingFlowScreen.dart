@@ -45,11 +45,11 @@ class _OnboardingFlowScreenState
           'demo_user',
           _selectedCurrency!,
         );
-        print(
-          '💾 Saved currency for demo_user: $_selectedCurrency',
-        );
+        // print(
+        //   '💾 Saved currency for demo_user: $_selectedCurrency',
+        // );
       } else {
-        print('⚠️ No currency selected before register.');
+        // print('⚠️ No currency selected before register.');
       }
 
       // Now continue to registration

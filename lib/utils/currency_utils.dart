@@ -50,7 +50,7 @@ Future<void> migrateCurrencyFromDemoTo(
   final demoCurrency = prefs.getString(demoKey);
 
   if (demoCurrency == null) {
-    print('⚠️ No currency found for demo_user to migrate.');
+    // print('⚠️ No currency found for demo_user to migrate.');
     return;
   }
 
@@ -58,7 +58,7 @@ Future<void> migrateCurrencyFromDemoTo(
     'currency_$newUserId',
     demoCurrency,
   );
-  print('✅ Currency migrated: $demoCurrency → $newUserId');
+  // print('✅ Currency migrated: $demoCurrency → $newUserId');
 
   // optional cleanup
   await prefs.remove(demoKey);

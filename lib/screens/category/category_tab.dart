@@ -71,7 +71,7 @@ class _CategoryTabState extends State<CategoryTab> {
           context,
         ).colorScheme.background,
         elevation: 0,
-        centerTitle: true,
+        // centerTitle: true,
         title: const Text(
           "Categories",
           style: TextStyle(

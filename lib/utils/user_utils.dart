@@ -115,7 +115,7 @@ Future<void> saveUserCategoriesForUser(
     '$_kUserCategoriesKeyPrefix$userId',
     jsonEncode(encoded),
   );
-  print('💾 Saved normalized categories for $userId');
+  // print('💾 Saved normalized categories for $userId');
 }
 
 Future<void> clearDemoTransactions() async {
@@ -126,9 +126,9 @@ Future<void> clearDemoTransactions() async {
         txn.id,
       );
     }
-    debugPrint(
-      'Cleared demo transactions before creating new user.',
-    );
+    // debugPrint(
+    //   'Cleared demo transactions before creating new user.',
+    // );
   }
 }
 
@@ -167,7 +167,7 @@ Future<void> normalizeUserCategories(String userId) async {
     ),
   );
 
-  print('✅ Normalized category icons for $userId');
+  // print('✅ Normalized category icons for $userId');
 }
 
 /// 🧩 Normalize all category icons after migration (for onboarding fix)
@@ -227,7 +227,7 @@ Future<void> normalizeCategoryIcons(String userId) async {
     jsonEncode(normalized),
   );
 
-  print('✅ Normalized category icons for $userId');
+  // print('✅ Normalized category icons for $userId');
 }
 
 ///  Load categories for a given user
@@ -238,7 +238,7 @@ loadUserCategoriesForUser(String userId) async {
   final saved = prefs.getString(key);
 
   if (saved == null) {
-    print('⚠️ No categories found for $userId');
+    // print('⚠️ No categories found for $userId');
     return [];
   }
 
@@ -296,9 +296,9 @@ loadUserCategoriesForUser(String userId) async {
   }).toList();
 
   await prefs.setString(key, jsonEncode(repaired));
-  print(
-    '✅ Normalized and repaired category icons for $userId',
-  );
+  // print(
+  //   '✅ Normalized and repaired category icons for $userId',
+  // );
 
   return categories;
 }
@@ -376,7 +376,7 @@ Future<void> migrateDemoCategoriesToUser(
   // 🧩 Normalize immediately after migration
   await normalizeCategoryIcons(userId);
 
-  print('✅ Migrated and normalized categories for $userId');
+  // print('✅ Migrated and normalized categories for $userId');
 }
 
 Future<void> deleteUserCategory(String categoryName) async {
@@ -411,7 +411,7 @@ Future<void> deleteUserCategory(String categoryName) async {
     remaining,
   );
 
-  print(
-    '🧾 Deleted category "$categoryName" and related transactions removed.',
-  );
+  // print(
+  //   '🧾 Deleted category "$categoryName" and related transactions removed.',
+  // );
 }

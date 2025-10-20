@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
         password,
       );
 
-      // ✅ Get the logged-in Firebase user
+      //  Get the logged-in Firebase user
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         await setCurrentUser(
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ); // store unique user ID
       }
 
-      // ✅ Handle remember-me
+      //  Handle remember-me
       final prefs = await SharedPreferences.getInstance();
       if (_rememberMe) {
         await prefs.setString("saved_email", email);
@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.remove("saved_email");
       }
 
-      // ✅ Navigate to home
+      //  Navigate to home
       if (mounted) context.go('/home');
     } on FirebaseAuthException catch (e) {
       String message;
