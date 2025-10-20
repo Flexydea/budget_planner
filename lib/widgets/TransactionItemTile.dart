@@ -6,7 +6,6 @@ import 'package:budget_planner/services/hive_transaction_service.dart';
 import 'package:budget_planner/models/data/data.dart';
 import 'package:budget_planner/utils/user_utils.dart';
 import 'package:budget_planner/utils/currency_utils.dart';
-import 'package:intl/intl.dart';
 
 class MyListviewTile extends StatefulWidget {
   const MyListviewTile({super.key});
@@ -24,10 +23,8 @@ class _MyListviewTileState extends State<MyListviewTile> {
   String formatAmount(double amount) {
     // If 1 million or more → compact display
     if (amount >= 1000000) {
-      // Divide and format to 1 decimal (e.g. 2.5M)
       final compactValue = (amount / 1000000)
           .toStringAsFixed(1);
-      // Remove trailing .0 for clean look (e.g. 2M instead of 2.0M)
       return '${compactValue.endsWith('.0') ? compactValue.replaceAll('.0', '') : compactValue}M';
     }
 
@@ -47,14 +44,40 @@ class _MyListviewTileState extends State<MyListviewTile> {
     _loadData();
   }
 
+  // ✅ NEW helper to properly decode saved icons (works for onboarding + user-created)
+  IconData? _decodeIcon(dynamic iconMap) {
+    if (iconMap is IconData) return iconMap;
+
+    if (iconMap is Map) {
+      return IconData(
+        iconMap['codePoint'] ?? 0xe14c,
+        fontFamily: iconMap['fontFamily'],
+        fontPackage: iconMap['fontPackage'],
+        matchTextDirection:
+            iconMap['matchTextDirection'] ?? false,
+      );
+    }
+
+    // Fallback for old integer storage
+    if (iconMap is int) {
+      final match = AvailableIcons.firstWhere(
+        (m) => (m['icon'] as IconData).codePoint == iconMap,
+        orElse: () => {'icon': Icons.category},
+      );
+      return match['icon'] as IconData;
+    }
+
+    return Icons.category;
+  }
+
   Future<void> _loadData() async {
     await loadCurrentUser();
 
-    // Load user currency
+    // Load currency
     final code = await getUserCurrency(currentUserId);
     _currencySymbol = currencySymbolOf(code);
 
-    // Default icons
+    // 1️⃣ Start with default icons (from data.dart)
     _categoryIcons.clear();
     for (final item in AvailableIcons) {
       final name = (item['name'] as String).toLowerCase();
@@ -62,20 +85,38 @@ class _MyListviewTileState extends State<MyListviewTile> {
       _categoryIcons[name] = icon;
     }
 
-    // User-created categories
+    // 2️⃣ Load + decode user categories exactly like CategoryTab does
     final userCats = await loadUserCategoriesForUser(
       currentUserId,
     );
+
     for (final cat in userCats) {
       final name =
           (cat['name'] as String?)?.toLowerCase() ?? '';
-      final icon = cat['icon'] as IconData?;
-      if (name.isNotEmpty && icon != null) {
-        _categoryIcons[name] = icon;
+      final iconMap = cat['icon'];
+
+      IconData? decoded;
+      if (iconMap is IconData) {
+        decoded = iconMap;
+      } else if (iconMap is Map) {
+        decoded = IconData(
+          iconMap['codePoint'] ?? 0xe14c,
+          fontFamily: iconMap['fontFamily'],
+          fontPackage: iconMap['fontPackage'],
+          matchTextDirection:
+              iconMap['matchTextDirection'] ?? false,
+        );
+      }
+
+      if (decoded != null && name.isNotEmpty) {
+        _categoryIcons[name] = decoded;
+        debugPrint(
+          ' Loaded icon for $name (${decoded.codePoint})',
+        );
       }
     }
 
-    // Transactions
+    // 3️⃣ Transactions
     final txns = HiveTransactionService.getAllTransactions()
       ..sort((a, b) => b.date.compareTo(a.date));
 
@@ -115,7 +156,6 @@ class _MyListviewTileState extends State<MyListviewTile> {
       );
     }
 
-    // 🔹 Layout identical to your original file
     return Expanded(
       child: ListView.builder(
         itemCount: _transactions.length,
@@ -143,7 +183,7 @@ class _MyListviewTileState extends State<MyListviewTile> {
                   mainAxisAlignment:
                       MainAxisAlignment.spaceBetween,
                   children: [
-                    // Left side — icon + name (unchanged UI)
+                    // Left side — icon + name
                     Row(
                       children: [
                         Stack(
@@ -176,7 +216,7 @@ class _MyListviewTileState extends State<MyListviewTile> {
                       ],
                     ),
 
-                    // Right side — amount + date (unchanged UI)
+                    // Right side — amount + date
                     Column(
                       crossAxisAlignment:
                           CrossAxisAlignment.end,
