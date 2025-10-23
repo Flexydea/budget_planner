@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,10 +18,9 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Animation setup
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
       vsync: this,
+      duration: const Duration(milliseconds: 1500),
     );
 
     _animation = CurvedAnimation(
@@ -29,10 +29,34 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _controller.forward();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _navigateNext(),
+    );
+  }
 
-    Future.delayed(const Duration(seconds: 2), () {
+  Future<void> _navigateNext() async {
+    await Future.delayed(const Duration(seconds: 2));
+    final prefs = await SharedPreferences.getInstance();
+
+    final bool hasCompletedOnboarding =
+        prefs.getBool('onboarding_complete') ?? false;
+    final bool isLoggedIn =
+        prefs.getBool('is_logged_in') ?? false;
+
+    print(
+      '🎯 onboarding_complete: $hasCompletedOnboarding',
+    );
+    print('🎯 is_logged_in: $isLoggedIn');
+
+    if (!mounted) return;
+
+    if (!hasCompletedOnboarding) {
       context.go('/onboarding');
-    });
+    } else if (!isLoggedIn) {
+      context.go('/register');
+    } else {
+      context.go('/home');
+    }
   }
 
   @override
@@ -49,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen>
         child: ScaleTransition(
           scale: _animation,
           child: Image.asset(
-            'assets/images/app_icon1.png', // Replace with your actual path
+            'assets/images/app_icon1.png',
             width: 120,
             height: 120,
           ),

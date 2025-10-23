@@ -143,6 +143,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       // 5️⃣ Save display name
       await saveUserName((widget.name ?? "User").trim());
+      // ✅ Save login state for persistence
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_logged_in', true);
 
       // 6️⃣ Navigate straight to home
       if (mounted) context.go('/home');

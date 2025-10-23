@@ -96,6 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       //  Navigate to home
+      await prefs.setBool('is_logged_in', true);
       if (mounted) context.go('/home');
     } on FirebaseAuthException catch (e) {
       String message;
