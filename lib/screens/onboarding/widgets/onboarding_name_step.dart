@@ -52,28 +52,33 @@ class _OnboardingNameStepState
               ),
             ),
           ),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed:
-                  widget.nameController.text.trim().isEmpty
-                  ? null
-                  : widget.onNext,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 14,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 40),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed:
+                    widget.nameController.text
+                        .trim()
+                        .isEmpty
+                    ? null
+                    : widget.onNext,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                "Next",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
+                child: const Text(
+                  "Next",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),

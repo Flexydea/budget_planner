@@ -109,39 +109,41 @@ class OnboardingCategoryStep extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
 
           //  Next button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: selectedCategories.isNotEmpty
-                  ? () async {
-                      await loadCurrentUser();
-                      final userId =
-                          currentUserId ?? 'demo_user';
-                      await saveUserCategoriesForUser(
-                        'demo_user',
-                        selectedCategories,
-                      );
-                      onNext(); // continue to the name/date step
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 14,
+          //  Next button (lifted up slightly with bottom padding)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 40),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: selectedCategories.isNotEmpty
+                    ? () async {
+                        await loadCurrentUser();
+                        await saveUserCategoriesForUser(
+                          'demo_user',
+                          selectedCategories,
+                        );
+                        onNext();
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Next',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
+                child: const Text(
+                  'Next',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),
